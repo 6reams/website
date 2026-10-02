@@ -1,0 +1,186 @@
+---
+---
+
+<section class="tool" data-tool="regex">
+  <div class="pattern">
+    <span class="slash">/</span>
+    <input id="re-pattern" type="text" value="\b\w+@\w+\.\w+\b" autocomplete="off" spellcheck="false" aria-label="Regular expression pattern" />
+    <span class="slash">/</span>
+    <input id="re-flags" type="text" value="g" autocomplete="off" spellcheck="false" aria-label="Flags" class="flags" placeholder="flags" />
+  </div>
+  <div class="flaghints label">
+    {['g', 'i', 'm', 's', 'u', 'y'].map((f) => <button type="button" class="flag-btn" data-flag={f}>{f}</button>)}
+  </div>
+  <p id="re-error" class="status-bad mono" role="alert" hidden></p>
+
+  <div class="field">
+    <label for="re-text">Test string</label>
+    <textarea id="re-text" autocomplete="off" spellcheck="false">Contact me: ahmad@example.com or someone@test.org</textarea>
+  </div>
+
+  <div class="label"><span id="re-count">0</span> match(es)</div>
+  <div class="highlight output" id="re-highlight" aria-live="polite"></div>
+  <div id="re-groups"></div>
+</section>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-tool="regex"]')!;
+  const patternEl = root.querySelector<HTMLInputElement>('#re-pattern')!;
+  const flagsEl = root.querySelector<HTMLInputElement>('#re-flags')!;
+  const textEl = root.querySelector<HTMLTextAreaElement>('#re-text')!;
+  const errorEl = root.querySelector<HTMLElement>('#re-error')!;
+  const highlight = root.querySelector<HTMLElement>('#re-highlight')!;
+  const countEl = root.querySelector<HTMLElement>('#re-count')!;
+  const groupsEl = root.querySelector<HTMLElement>('#re-groups')!;
+
+  const escapeHtml = (s: string) =>
+    s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
+
+  function run() {
+    errorEl.hidden = true;
+    const pattern = patternEl.value;
+    const flags = flagsEl.value;
+    const text = textEl.value;
+    groupsEl.innerHTML = '';
+
+    if (!pattern) {
+      highlight.textContent = text;
+      countEl.textContent = '0';
+      return;
+    }
+
+    let re: RegExp;
+    try {
+      re = new RegExp(pattern, flags);
+    } catch (e) {
+      errorEl.hidden = false;
+      errorEl.textContent = (e as Error).message;
+      highlight.textContent = text;
+      return;
+    }
+
+    const global = flags.includes('g');
+    const matches = global ? [...text.matchAll(re)] : ([text.match(re)].filter(Boolean) as RegExpMatchArray[]);
+    countEl.textContent = String(matches.length);
+
+    // Build highlighted output.
+    let html = '';
+    let last = 0;
+    const stepper = new RegExp(pattern, global ? flags : flags + 'g');
+    let m: RegExpExecArray | null;
+    let guard = 0;
+    while ((m = stepper.exec(text)) && guard++ < 10000) {
+      html += escapeHtml(text.slice(last, m.index));
+      html += `<mark>${escapeHtml(m[0]) || '∅'}</mark>`;
+      last = m.index + m[0].length;
+      if (m[0] === '') stepper.lastIndex++;
+      if (!global) break;
+    }
+    html += escapeHtml(text.slice(last));
+    highlight.innerHTML = html || '<span class="muted">No match</span>';
+
+    // Capture groups of the first match.
+    const first = matches[0];
+    if (first && (first.length > 1 || first.groups)) {
+      const dl = document.createElement('dl');
+      dl.className = 'kv groups';
+      for (let i = 1; i < first.length; i++) {
+        const dt = document.createElement('dt');
+        dt.textContent = `Group ${i}`;
+        const dd = document.createElement('dd');
+        dd.textContent = first[i] ?? '(undefined)';
+        dl.append(dt, dd);
+      }
+      for (const [name, val] of Object.entries(first.groups ?? {})) {
+        const dt = document.createElement('dt');
+        dt.textContent = name;
+        const dd = document.createElement('dd');
+        dd.textContent = val ?? '(undefined)';
+        dl.append(dt, dd);
+      }
+      groupsEl.append(dl);
+    }
+  }
+
+  root.addEventListener('input', run);
+  root.querySelectorAll<HTMLButtonElement>('.flag-btn').forEach((btn) =>
+    btn.addEventListener('click', () => {
+      const f = btn.dataset.flag!;
+      flagsEl.value = flagsEl.value.includes(f) ? flagsEl.value.replace(f, '') : flagsEl.value + f;
+      run();
+    }),
+  );
+  run();
+</script>
+
+<style>
+  .pattern {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--bg-soft);
+  }
+  .pattern:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .pattern input {
+    border: 0;
+    background: transparent;
+    min-height: 2.25rem;
+    padding: 0.3rem 0;
+  }
+  .pattern input:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+  .flags {
+    max-width: 5rem;
+  }
+  .slash {
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+  }
+  .flaghints {
+    display: flex;
+    gap: 0.4rem;
+    margin: 0.6rem 0 0.25rem;
+  }
+  .flag-btn {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg-elev);
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .flag-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .highlight {
+    margin-top: 0.4rem;
+    min-height: 4rem;
+    line-height: 1.8;
+  }
+  .highlight :global(mark) {
+    background: color-mix(in srgb, var(--accent) 35%, transparent);
+    color: inherit;
+    border-radius: 3px;
+    padding: 0.05em 0.1em;
+  }
+  .groups {
+    margin-top: 1.25rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-soft);
+  }
+</style>

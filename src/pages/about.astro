@@ -1,0 +1,181 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '@config';
+import { timeline, skills, languages } from '@/data/profile';
+import { getCerts } from '@/lib/content';
+
+const certs = await getCerts();
+const kindLabel = { work: 'Role', education: 'Education', award: 'Award' };
+---
+
+<BaseLayout title="About" description={site.bio}>
+  <div class="container">
+    <header class="page-head prose-width">
+      <p class="eyebrow">About</p>
+      <h1>{site.name}</h1>
+      <p>{site.bio}</p>
+      <div class="btn-row mt-3">
+        <a class="btn btn-primary" href={site.cv} download>Download CV</a>
+        <a class="btn" href="/contact/">Contact</a>
+      </div>
+    </header>
+
+    <section class="section section-loose">
+      <h2>Skills</h2>
+      <div class="skills">
+        {
+          skills.map((group) => (
+            <div class="skill-group">
+              <h3 class="label label-accent">{group.group}</h3>
+              <ul class="tags">
+                {group.items.map((item) => <li><span class="tag">{item}</span></li>)}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Timeline</h2>
+      <ol class="timeline">
+        {
+          timeline.map((item) => (
+            <li class:list={['tl-item', item.kind]}>
+              <div class="tl-when label">{item.period}</div>
+              <div class="tl-body">
+                <div class="tl-tag label">{kindLabel[item.kind]}</div>
+                <h3>{item.title}</h3>
+                <p class="tl-org">{item.org}</p>
+                {item.points && (
+                  <ul>
+                    {item.points.map((p) => <li>{p}</li>)}
+                  </ul>
+                )}
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="section">
+      <div class="two-col">
+        <div>
+          <h2>Certifications</h2>
+          <ul class="cert-list">
+            {certs.map((c) => (
+              <li>
+                <span class="mono cert-abbr">{c.data.abbr}</span>
+                <span>{c.data.name} <span class="muted">· {c.data.issuer}</span></span>
+              </li>
+            ))}
+          </ul>
+          <a class="link-arrow" href="/certifications/">All certifications</a>
+        </div>
+        <div>
+          <h2>Languages</h2>
+          <dl class="kv">
+            {languages.map((l) => <><dt>{l.name}</dt><dd>{l.level}</dd></>)}
+          </dl>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .skills {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  }
+  .skill-group h3 {
+    margin-bottom: 0.75rem;
+  }
+  .timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-width: 48rem;
+  }
+  .tl-item {
+    display: grid;
+    gap: 0.5rem 1.5rem;
+    padding: 0 0 2rem 1.5rem;
+    border-left: 2px solid var(--border);
+    position: relative;
+  }
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -0.45rem;
+    top: 0.3rem;
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+  }
+  .tl-item.award::before {
+    background: var(--accent);
+  }
+  .tl-item:last-child {
+    padding-bottom: 0;
+  }
+  .tl-when {
+    padding-top: 0.15rem;
+  }
+  .tl-tag {
+    font-size: 0.68rem;
+  }
+  .tl-body h3 {
+    margin: 0.2rem 0 0.1rem;
+    font-size: 1.1rem;
+  }
+  .tl-org {
+    color: var(--muted);
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+  }
+  .tl-body ul {
+    margin: 0.5rem 0 0;
+    padding-left: 1.1rem;
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+  .tl-body li {
+    margin: 0.3rem 0;
+  }
+  .two-col {
+    display: grid;
+    gap: 2.5rem;
+  }
+  .cert-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+    display: grid;
+    gap: 0.6rem;
+  }
+  .cert-list li {
+    display: grid;
+    grid-template-columns: 4rem 1fr;
+    gap: 0.75rem;
+    align-items: baseline;
+    font-size: 0.95rem;
+  }
+  .cert-abbr {
+    font-size: 0.8rem;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  @media (min-width: 46rem) {
+    .tl-item {
+      grid-template-columns: 11rem 1fr;
+    }
+    .two-col {
+      grid-template-columns: 1.4fr 1fr;
+    }
+  }
+</style>

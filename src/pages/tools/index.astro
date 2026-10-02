@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ToolNotice from '../../components/ToolNotice.astro';
+import { tools } from '@/tools/registry';
+---
+
+<BaseLayout title="Tools" description="A small set of browser-based security utilities. Everything runs locally — nothing is sent to a server.">
+  <div class="container">
+    <header class="page-head">
+      <p class="eyebrow">Utilities</p>
+      <h1>Security tools</h1>
+      <p>A small, growing set of utilities I reach for often. Pick one — they all run entirely in your browser.</p>
+    </header>
+    <section class="section section-tight">
+      <ToolNotice />
+      <div class="grid">
+        {
+          tools.map((tool) => (
+            <article class="card">
+              <div class="glyph mono" aria-hidden="true">{tool.icon}</div>
+              <h2><a class="stretched" href={`/tools/${tool.slug}/`}>{tool.name}</a></h2>
+              <p>{tool.description}</p>
+              <div class="card-foot">
+                <span class="label">{tool.tagline}</span>
+                <span class="link-arrow" aria-hidden="true">Open</span>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .card h2 {
+    font-size: 1.15rem;
+  }
+  .glyph {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 10px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 1rem;
+  }
+</style>

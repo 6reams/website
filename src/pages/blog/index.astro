@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostItem from '../../components/PostItem.astro';
+import { getPosts, allTags } from '@/lib/content';
+
+const posts = await getPosts();
+const tags = allTags(posts);
+---
+
+<BaseLayout title="Blog" description="Notes on offensive security, Active Directory, web app testing and reporting.">
+  <div class="container prose-width">
+    <header class="page-head">
+      <p class="eyebrow">Writing</p>
+      <h1>Blog</h1>
+      <p>Notes on offensive security, Active Directory, web application testing and writing reports people act on.</p>
+      {
+        tags.length > 0 && (
+          <ul class="tags mt-3" aria-label="Browse by tag">
+            {tags.map((t) => (
+              <li><a class="tag" href={`/blog/tags/${t.slug}/`}>{t.tag} · {t.count}</a></li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+    <section class="section section-tight">
+      {posts.length === 0 && <p class="muted">No posts yet.</p>}
+      {posts.map((post) => <PostItem post={post} headingLevel="h2" />)}
+    </section>
+  </div>
+</BaseLayout>

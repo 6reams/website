@@ -1,0 +1,21 @@
+---
+import { slugify } from '@/lib/content';
+
+interface Props {
+  tags: string[];
+  /** Link tags to blog tag pages. */
+  linked?: boolean;
+  label?: string;
+}
+const { tags, linked = false, label = 'Tags' } = Astro.props;
+---
+
+{
+  tags.length > 0 && (
+    <ul class="tags" aria-label={label}>
+      {tags.map((t) => (
+        <li>{linked ? <a class="tag" href={`/blog/tags/${slugify(t)}/`}>{t}</a> : <span class="tag">{t}</span>}</li>
+      ))}
+    </ul>
+  )
+}

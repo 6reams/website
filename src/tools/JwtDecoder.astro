@@ -1,0 +1,132 @@
+---
+---
+
+<section class="tool" data-tool="jwt">
+  <div class="callout">
+    <strong>Decode only.</strong> This tool splits and base64url-decodes the token locally. It does
+    <em>not</em> verify the signature and never sends or stores the token. Treat any token you paste as
+    a live credential.
+  </div>
+
+  <div class="field">
+    <label for="jwt-input">JSON Web Token</label>
+    <textarea id="jwt-input" placeholder="eyJhbGciOi…" autocomplete="off" spellcheck="false"></textarea>
+  </div>
+  <p id="jwt-error" class="status-bad mono" role="alert" hidden></p>
+
+  <div id="jwt-out" hidden>
+    <div class="part">
+      <div class="label label-accent">Header</div>
+      <pre class="output"><code id="jwt-header"></code></pre>
+    </div>
+    <div class="part">
+      <div class="label label-accent">Payload</div>
+      <pre class="output"><code id="jwt-payload"></code></pre>
+    </div>
+    <dl class="kv" id="jwt-claims"></dl>
+    <div class="part">
+      <div class="label">Signature <span class="muted">· not verified</span></div>
+      <output class="output mono" id="jwt-sig"></output>
+    </div>
+  </div>
+</section>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-tool="jwt"]')!;
+  const input = root.querySelector<HTMLTextAreaElement>('#jwt-input')!;
+  const errorEl = root.querySelector<HTMLElement>('#jwt-error')!;
+  const out = root.querySelector<HTMLElement>('#jwt-out')!;
+  const headerEl = root.querySelector<HTMLElement>('#jwt-header')!;
+  const payloadEl = root.querySelector<HTMLElement>('#jwt-payload')!;
+  const sigEl = root.querySelector<HTMLElement>('#jwt-sig')!;
+  const claimsEl = root.querySelector<HTMLDListElement>('#jwt-claims')!;
+
+  const dec = new TextDecoder('utf-8', { fatal: true });
+  function b64urlToJson(part: string): unknown {
+    let s = part.replace(/-/g, '+').replace(/_/g, '/');
+    while (s.length % 4) s += '=';
+    const bytes = Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+    return JSON.parse(dec.decode(bytes));
+  }
+
+  const fmtTime = (n: unknown) =>
+    typeof n === 'number' ? ` → ${new Date(n * 1000).toISOString().replace('.000', '')}` : '';
+
+  function describeClaims(payload: Record<string, unknown>) {
+    const known: Record<string, string> = {
+      iss: 'Issuer',
+      sub: 'Subject',
+      aud: 'Audience',
+      exp: 'Expires',
+      nbf: 'Not before',
+      iat: 'Issued at',
+      jti: 'JWT ID',
+    };
+    claimsEl.innerHTML = '';
+    for (const [key, label] of Object.entries(known)) {
+      if (!(key in payload)) continue;
+      const dt = document.createElement('dt');
+      dt.textContent = label;
+      const dd = document.createElement('dd');
+      const v = payload[key];
+      let text = Array.isArray(v) ? v.join(', ') : String(v);
+      if (key === 'exp' || key === 'nbf' || key === 'iat') text += fmtTime(v);
+      if (key === 'exp' && typeof v === 'number') {
+        const expired = v * 1000 < Date.now();
+        dd.className = expired ? 'status-bad' : 'status-ok';
+        text += expired ? ' (expired)' : ' (valid)';
+      }
+      dd.textContent = text;
+      claimsEl.append(dt, dd);
+    }
+  }
+
+  function run() {
+    errorEl.hidden = true;
+    const token = input.value.trim();
+    if (!token) {
+      out.hidden = true;
+      return;
+    }
+    const parts = token.split('.');
+    if (parts.length < 2) {
+      out.hidden = true;
+      errorEl.hidden = false;
+      errorEl.textContent = 'Not a JWT: expected at least two dot-separated segments.';
+      return;
+    }
+    try {
+      const header = b64urlToJson(parts[0]);
+      const payload = b64urlToJson(parts[1]);
+      headerEl.textContent = JSON.stringify(header, null, 2);
+      payloadEl.textContent = JSON.stringify(payload, null, 2);
+      sigEl.textContent = parts[2] || '(none — unsecured token)';
+      describeClaims(payload as Record<string, unknown>);
+      out.hidden = false;
+    } catch (e) {
+      out.hidden = true;
+      errorEl.hidden = false;
+      errorEl.textContent = `Could not decode: ${(e as Error).message}`;
+    }
+  }
+
+  input.addEventListener('input', run);
+</script>
+
+<style>
+  .part {
+    margin-top: 1.25rem;
+  }
+  .part pre {
+    margin: 0.4rem 0 0;
+    max-height: 22rem;
+    overflow: auto;
+  }
+  .kv {
+    margin-top: 1.25rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-soft);
+  }
+</style>

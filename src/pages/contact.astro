@@ -1,0 +1,120 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '@config';
+
+const channels = [
+  site.email && { label: 'Email', value: site.email, href: `mailto:${site.email}`, glyph: '@' },
+  site.socials.github && { label: 'GitHub', value: site.socials.github.replace('https://', ''), href: site.socials.github, glyph: 'gh' },
+  site.socials.linkedin && { label: 'LinkedIn', value: site.socials.linkedin.replace('https://www.', ''), href: site.socials.linkedin, glyph: 'in' },
+].filter(Boolean) as { label: string; value: string; href: string; glyph: string }[];
+---
+
+<BaseLayout title="Contact" description={`Get in touch with ${site.name}.`}>
+  <div class="container prose-width">
+    <header class="page-head">
+      <p class="eyebrow">Say hello</p>
+      <h1>Contact</h1>
+      <p>Open to penetration testing work, red team engagements and security training. The fastest way to reach me is email.</p>
+    </header>
+
+    <section class="section section-tight">
+      <ul class="channels">
+        {
+          channels.map((c) => (
+            <li>
+              <a href={c.href} rel="me noopener" target={c.href.startsWith('mailto') ? undefined : '_blank'}>
+                <span class="glyph mono" aria-hidden="true">{c.glyph}</span>
+                <span class="meta">
+                  <span class="label">{c.label}</span>
+                  <span class="val mono">{c.value}</span>
+                </span>
+                <span class="arrow" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="pgp">
+        <h2>PGP</h2>
+        {
+          site.pgp.fingerprint ? (
+            <>
+              <p class="muted">For sensitive reports or disclosures, encrypt to my public key.</p>
+              <dl class="kv">
+                <dt>Fingerprint</dt>
+                <dd>{site.pgp.fingerprint}</dd>
+              </dl>
+              <a class="btn btn-sm" href={site.pgp.keyUrl} download>Download public key</a>
+            </>
+          ) : (
+            <p class="muted">
+              A PGP key isn't published yet. Add your fingerprint and key file in
+              <code>site.config.ts</code> and <code>public/pgp.asc</code> to show this section.
+            </p>
+          )
+        }
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .channels {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 3rem;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .channels a {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elev);
+    text-decoration: none;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .channels a:hover {
+    border-color: var(--accent);
+    transform: translateX(3px);
+  }
+  .glyph {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 10px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .meta {
+    display: grid;
+    gap: 0.1rem;
+    min-width: 0;
+  }
+  .val {
+    overflow-wrap: anywhere;
+  }
+  .arrow {
+    margin-left: auto;
+    color: var(--muted);
+  }
+  .pgp {
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-soft);
+  }
+  .pgp h2 {
+    margin-top: 0;
+  }
+  .pgp .btn {
+    margin-top: 1rem;
+  }
+</style>

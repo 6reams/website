@@ -1,0 +1,61 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TagList from '../../components/TagList.astro';
+import { getProjects, formatDate } from '@/lib/content';
+
+export const getStaticPaths = (async () => {
+  const projects = await getProjects();
+  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+}) satisfies GetStaticPaths;
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const { title, description, tags, link, repo, date } = project.data;
+---
+
+<BaseLayout title={title} description={description} type="article" tags={tags} publishedTime={date}>
+  <div class="container">
+    <article class="prose-width">
+      <header class="page-head">
+        <a class="link-back" href="/projects/">← Projects</a>
+        <h1>{title}</h1>
+        <p>{description}</p>
+        <div class="proj-meta">
+          <TagList tags={tags} label="Tech" />
+          <span class="label">{formatDate(date)}</span>
+        </div>
+        {
+          (link || repo) && (
+            <div class="btn-row mt-3">
+              {link && <a class="btn btn-primary btn-sm" href={link} rel="noopener" target="_blank">Live / demo ↗</a>}
+              {repo && <a class="btn btn-sm" href={repo} rel="noopener" target="_blank">Source ↗</a>}
+            </div>
+          )
+        }
+      </header>
+      <div class="prose">
+        <Content />
+      </div>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .link-back {
+    display: inline-block;
+    margin-bottom: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .proj-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+    align-items: center;
+    margin-top: 1rem;
+  }
+</style>

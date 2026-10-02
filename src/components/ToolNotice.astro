@@ -1,0 +1,35 @@
+---
+---
+<aside class="notice">
+  <span class="dot" aria-hidden="true"></span>
+  <p>
+    <strong>100% client-side.</strong> This tool runs entirely in your browser using local JavaScript and the
+    Web Crypto API. Nothing you enter is sent to any server, logged, or stored.
+  </p>
+</aside>
+
+<style>
+  .notice {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 0.9rem 1.1rem;
+    border: 1px solid color-mix(in srgb, var(--ok) 40%, var(--border));
+    background: color-mix(in srgb, var(--ok) 8%, transparent);
+    border-radius: var(--radius);
+    margin-bottom: 2rem;
+  }
+  .notice p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  .dot {
+    flex: none;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin-top: 0.4rem;
+    border-radius: 50%;
+    background: var(--ok);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 20%, transparent);
+  }
+</style>

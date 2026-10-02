@@ -1,0 +1,22 @@
+---
+import type { Project } from '@/lib/content';
+import TagList from './TagList.astro';
+
+interface Props {
+  project: Project;
+  headingLevel?: 'h2' | 'h3';
+}
+const { project, headingLevel = 'h3' } = Astro.props;
+const H = headingLevel;
+const { title, description, tags, date } = project.data;
+---
+
+<article class="card">
+  <div class="label">{date.getUTCFullYear()}</div>
+  <H><a class="stretched" href={`/projects/${project.id}/`}>{title}</a></H>
+  <p>{description}</p>
+  <div class="card-foot">
+    <TagList tags={tags} label="Tech" />
+    <span class="link-arrow" aria-hidden="true">Read</span>
+  </div>
+</article>

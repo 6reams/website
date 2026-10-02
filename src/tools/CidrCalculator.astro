@@ -1,0 +1,102 @@
+---
+---
+
+<section class="tool" data-tool="cidr">
+  <div class="field">
+    <label for="cidr-input">IPv4 CIDR</label>
+    <input id="cidr-input" type="text" value="192.168.1.0/24" autocomplete="off" spellcheck="false" placeholder="10.0.0.0/8" />
+  </div>
+  <p id="cidr-error" class="status-bad mono" role="alert" hidden></p>
+
+  <dl class="kv result" id="cidr-result" hidden>
+    <dt>Network</dt><dd id="r-network"></dd>
+    <dt>Broadcast</dt><dd id="r-broadcast"></dd>
+    <dt>Netmask</dt><dd id="r-mask"></dd>
+    <dt>Wildcard</dt><dd id="r-wildcard"></dd>
+    <dt>First host</dt><dd id="r-first"></dd>
+    <dt>Last host</dt><dd id="r-last"></dd>
+    <dt>Usable hosts</dt><dd id="r-count"></dd>
+    <dt>Total addresses</dt><dd id="r-total"></dd>
+    <dt>Range</dt><dd id="r-range"></dd>
+  </dl>
+</section>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-tool="cidr"]')!;
+  const input = root.querySelector<HTMLInputElement>('#cidr-input')!;
+  const errorEl = root.querySelector<HTMLElement>('#cidr-error')!;
+  const result = root.querySelector<HTMLElement>('#cidr-result')!;
+  const set = (id: string, v: string) => (root.querySelector(`#${id}`)!.textContent = v);
+
+  const toInt = (ip: string) =>
+    ip.split('.').reduce((acc, oct) => (acc * 256 + Number(oct)) >>> 0, 0) >>> 0;
+  const toIp = (n: number) =>
+    [(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255].join('.');
+
+  function parseOctets(ip: string): number[] {
+    const parts = ip.split('.');
+    if (parts.length !== 4) throw new Error('IPv4 address needs four octets');
+    return parts.map((p) => {
+      if (!/^\d{1,3}$/.test(p)) throw new Error(`"${p}" is not a valid octet`);
+      const n = Number(p);
+      if (n > 255) throw new Error(`Octet ${n} is out of range (0–255)`);
+      return n;
+    });
+  }
+
+  function run() {
+    errorEl.hidden = true;
+    const raw = input.value.trim();
+    if (!raw) {
+      result.hidden = true;
+      return;
+    }
+    try {
+      const [ipPart, prefixPart = '32'] = raw.split('/');
+      parseOctets(ipPart);
+      const prefix = Number(prefixPart);
+      if (!/^\d+$/.test(prefixPart) || prefix < 0 || prefix > 32) throw new Error('Prefix must be 0–32');
+
+      const ipInt = toInt(ipPart);
+      const mask = prefix === 0 ? 0 : (0xffffffff << (32 - prefix)) >>> 0;
+      const network = (ipInt & mask) >>> 0;
+      const broadcast = (network | (~mask >>> 0)) >>> 0;
+      const total = 2 ** (32 - prefix);
+      const usable = prefix >= 31 ? (prefix === 32 ? 1 : 2) : total - 2;
+      const first = prefix >= 31 ? network : (network + 1) >>> 0;
+      const last = prefix >= 31 ? broadcast : (broadcast - 1) >>> 0;
+
+      set('r-network', `${toIp(network)}/${prefix}`);
+      set('r-broadcast', toIp(broadcast));
+      set('r-mask', toIp(mask));
+      set('r-wildcard', toIp(~mask >>> 0));
+      set('r-first', toIp(first));
+      set('r-last', toIp(last));
+      set('r-count', usable.toLocaleString());
+      set('r-total', total.toLocaleString());
+      set('r-range', `${toIp(network)} – ${toIp(broadcast)}`);
+      result.hidden = false;
+    } catch (e) {
+      result.hidden = true;
+      errorEl.hidden = false;
+      errorEl.textContent = (e as Error).message;
+    }
+  }
+
+  input.addEventListener('input', run);
+  run();
+</script>
+
+<style>
+  .result {
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elev);
+    gap: 0.6rem 1.5rem;
+  }
+  .result dd {
+    font-size: 0.95rem;
+  }
+</style>

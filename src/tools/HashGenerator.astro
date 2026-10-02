@@ -1,0 +1,140 @@
+---
+---
+
+<section class="tool" data-tool="hash">
+  <div class="field">
+    <label for="hash-input">Text to hash</label>
+    <textarea id="hash-input" placeholder="Type or paste text…" autocomplete="off" spellcheck="false"></textarea>
+  </div>
+
+  <div class="btn-row">
+    <label class="btn btn-sm" role="button">
+      <input id="hash-file" type="file" hidden />
+      Hash a file instead
+    </label>
+    <button id="hash-clear" class="btn btn-sm" type="button">Clear</button>
+    <span id="hash-file-name" class="label" hidden></span>
+  </div>
+
+  <div class="results" id="hash-results">
+    <div class="hrow" data-algo="MD5">
+      <div class="label">MD5 <span class="status-warn">· not secure</span></div>
+      <output class="output"></output>
+      <button class="btn btn-sm copy" type="button" data-copy>Copy</button>
+    </div>
+    <div class="hrow" data-algo="SHA-1">
+      <div class="label">SHA-1 <span class="status-warn">· not secure</span></div>
+      <output class="output"></output>
+      <button class="btn btn-sm copy" type="button" data-copy>Copy</button>
+    </div>
+    <div class="hrow" data-algo="SHA-256">
+      <div class="label">SHA-256</div>
+      <output class="output"></output>
+      <button class="btn btn-sm copy" type="button" data-copy>Copy</button>
+    </div>
+    <div class="hrow" data-algo="SHA-512">
+      <div class="label">SHA-512</div>
+      <output class="output"></output>
+      <button class="btn btn-sm copy" type="button" data-copy>Copy</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { md5 } from './md5';
+
+  const root = document.querySelector<HTMLElement>('[data-tool="hash"]')!;
+  const input = root.querySelector<HTMLTextAreaElement>('#hash-input')!;
+  const fileInput = root.querySelector<HTMLInputElement>('#hash-file')!;
+  const fileName = root.querySelector<HTMLElement>('#hash-file-name')!;
+  const rows = [...root.querySelectorAll<HTMLElement>('.hrow')];
+  const toHex = (buf: ArrayBuffer) =>
+    [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+
+  async function hashAll(bytes: Uint8Array) {
+    for (const row of rows) {
+      const algo = row.dataset.algo!;
+      const out = row.querySelector('output')!;
+      try {
+        if (algo === 'MD5') {
+          out.textContent = md5(bytes);
+        } else {
+          const digest = await crypto.subtle.digest(algo, bytes as BufferSource);
+          out.textContent = toHex(digest);
+        }
+      } catch {
+        out.textContent = '—';
+      }
+    }
+  }
+
+  const empty = () => rows.forEach((r) => (r.querySelector('output')!.textContent = ''));
+
+  input.addEventListener('input', () => {
+    fileInput.value = '';
+    fileName.hidden = true;
+    const text = input.value;
+    if (!text) return empty();
+    hashAll(new TextEncoder().encode(text));
+  });
+
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files?.[0];
+    if (!file) return;
+    input.value = '';
+    fileName.hidden = false;
+    fileName.textContent = `${file.name} · ${file.size.toLocaleString()} bytes`;
+    hashAll(new Uint8Array(await file.arrayBuffer()));
+  });
+
+  root.querySelector('#hash-clear')!.addEventListener('click', () => {
+    input.value = '';
+    fileInput.value = '';
+    fileName.hidden = true;
+    empty();
+    input.focus();
+  });
+
+  root.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((btn) =>
+    btn.addEventListener('click', async () => {
+      const value = btn.closest('.hrow')!.querySelector('output')!.textContent ?? '';
+      if (!value) return;
+      try {
+        await navigator.clipboard.writeText(value);
+        const prev = btn.textContent;
+        btn.textContent = 'Copied';
+        setTimeout(() => (btn.textContent = prev), 1200);
+      } catch {
+        /* clipboard blocked */
+      }
+    }),
+  );
+</script>
+
+<style>
+  .results {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  .hrow {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas: 'label label' 'out copy';
+    gap: 0.4rem 0.75rem;
+    align-items: start;
+  }
+  .hrow .label {
+    grid-area: label;
+  }
+  .hrow output {
+    grid-area: out;
+  }
+  .hrow .copy {
+    grid-area: copy;
+    align-self: stretch;
+  }
+  label[role='button'] {
+    cursor: pointer;
+  }
+</style>

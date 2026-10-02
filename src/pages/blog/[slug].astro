@@ -1,0 +1,66 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TagList from '../../components/TagList.astro';
+import { getPosts, formatDate, readingTime } from '@/lib/content';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}) satisfies GetStaticPaths;
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const { title, description, tags, date, updated } = post.data;
+---
+
+<BaseLayout title={title} description={description} type="article" tags={tags} publishedTime={date} modifiedTime={updated}>
+  <div class="container">
+    <article class="prose-width">
+      <header class="page-head">
+        <a class="link-back" href="/blog/">← Blog</a>
+        <h1>{title}</h1>
+        <div class="post-meta label">
+          <time datetime={date.toISOString()}>{formatDate(date)}</time>
+          <span aria-hidden="true">·</span>
+          <span>{readingTime(post.body)}</span>
+          {updated && <><span aria-hidden="true">·</span><span>updated {formatDate(updated)}</span></>}
+        </div>
+      </header>
+      <div class="prose">
+        <Content />
+      </div>
+      <footer class="post-foot">
+        <TagList tags={tags} linked />
+        <a class="link-arrow" href="/blog/">More posts</a>
+      </footer>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .link-back {
+    display: inline-block;
+    margin-bottom: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .post-meta {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .post-foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+</style>

@@ -1,0 +1,11 @@
+[
+  { "id": "cpts",  "name": "Certified Penetration Testing Specialist", "abbr": "CPTS",  "issuer": "Hack The Box",                    "credentialUrl": "", "order": 1, "description": "Full-scope penetration testing: enumeration, web and AD exploitation, pivoting and professional reporting." },
+  { "id": "crte",  "name": "Certified Red Team Expert",                 "abbr": "CRTE",  "issuer": "Altered Security",                "credentialUrl": "", "order": 2, "description": "Advanced Active Directory attacks across forests and trusts in a hardened enterprise lab." },
+  { "id": "crtp",  "name": "Certified Red Team Professional",           "abbr": "CRTP",  "issuer": "Altered Security",                "credentialUrl": "", "order": 3, "description": "Active Directory enumeration, privilege escalation, Kerberos abuse and persistence." },
+  { "id": "emapt", "name": "Mobile Application Penetration Tester",     "abbr": "eMAPT", "issuer": "INE / eLearnSecurity",            "credentialUrl": "", "order": 4, "description": "Android and iOS application security testing, static and dynamic analysis." },
+  { "id": "oswp",  "name": "OffSec Wireless Professional",              "abbr": "OSWP",  "issuer": "OffSec",                          "credentialUrl": "", "order": 5, "description": "Wireless network auditing: WEP/WPA/WPA2 and enterprise attacks." },
+  { "id": "crta",  "name": "Certified Red Team Analyst",                "abbr": "CRTA",  "issuer": "CyberWarFare Labs",               "credentialUrl": "", "order": 6 },
+  { "id": "cap",   "name": "Certified AppSec Practitioner",             "abbr": "CAP",   "issuer": "The SecOps Group",                "credentialUrl": "", "order": 7 },
+  { "id": "cnsp",  "name": "Certified Network Security Practitioner",   "abbr": "CNSP",  "issuer": "The SecOps Group",                "credentialUrl": "", "order": 8 },
+  { "id": "cpe",   "name": "CPE Certificate",                           "abbr": "CPE",   "issuer": "ISSUER — edit in src/data/certifications.json", "credentialUrl": "", "order": 9 }
+]

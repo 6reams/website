@@ -1,0 +1,60 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ToolNotice from '../../components/ToolNotice.astro';
+import { tools } from '@/tools/registry';
+import { toolComponents, type ToolComponentKey } from '@/tools/components';
+
+export const getStaticPaths = (() =>
+  tools.map((tool) => ({ params: { slug: tool.slug }, props: { tool } }))) satisfies GetStaticPaths;
+
+const { tool } = Astro.props;
+const Tool = toolComponents[tool.component as ToolComponentKey];
+const others = tools.filter((t) => t.slug !== tool.slug);
+---
+
+<BaseLayout title={tool.name} description={tool.description}>
+  <div class="container">
+    <header class="page-head">
+      <a class="link-back" href="/tools/">← Tools</a>
+      <h1>{tool.name}</h1>
+      <p>{tool.description}</p>
+    </header>
+    <div class="tool-wrap prose-width">
+      <ToolNotice />
+      <Tool />
+    </div>
+    <nav class="more" aria-label="Other tools">
+      <span class="label">Other tools</span>
+      <ul>
+        {others.map((t) => <li><a class="tag" href={`/tools/${t.slug}/`}>{t.name}</a></li>)}
+      </ul>
+    </nav>
+  </div>
+</BaseLayout>
+
+<style>
+  .link-back {
+    display: inline-block;
+    margin-bottom: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .tool-wrap {
+    margin-bottom: 3rem;
+  }
+  .more {
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+  .more ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0.75rem 0 0;
+  }
+</style>

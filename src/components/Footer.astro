@@ -1,0 +1,65 @@
+---
+import { site } from '@config';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container foot">
+    <p class="mono small">
+      <span class="accent">$</span> echo "© {year} {site.name}" <span class="muted">· {site.url.replace('https://', '')}</span>
+    </p>
+    <ul class="links">
+      {site.email && <li><a href={`mailto:${site.email}`}>Email</a></li>}
+      {site.socials.github && <li><a href={site.socials.github} rel="me noopener">GitHub</a></li>}
+      {site.socials.linkedin && <li><a href={site.socials.linkedin} rel="me noopener">LinkedIn</a></li>}
+      <li><a href="/rss.xml">RSS</a></li>
+    </ul>
+  </div>
+  <div class="container">
+    <p class="note">No cookies. No trackers. No third-party scripts. Strict CSP.</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--space);
+    border-top: 1px solid var(--border);
+    padding-block: 2rem 2.5rem;
+  }
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .small {
+    font-size: 0.85rem;
+    margin: 0;
+  }
+  .accent {
+    color: var(--accent);
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0.9rem;
+  }
+  .links a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .links a:hover {
+    color: var(--accent);
+  }
+  .note {
+    margin: 1rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+</style>

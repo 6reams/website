@@ -1,0 +1,29 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostItem from '../../../components/PostItem.astro';
+import { getPosts, allTags, slugify } from '@/lib/content';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPosts();
+  return allTags(posts).map(({ slug, tag }) => ({
+    params: { tag: slug },
+    props: { tag, posts: posts.filter((p) => p.data.tags.some((t) => slugify(t) === slug)) },
+  }));
+}) satisfies GetStaticPaths;
+
+const { tag, posts } = Astro.props;
+---
+
+<BaseLayout title={`#${tag}`} description={`Posts tagged "${tag}".`}>
+  <div class="container prose-width">
+    <header class="page-head">
+      <p class="eyebrow">Tag</p>
+      <h1>#{tag}</h1>
+      <p>{posts.length} post{posts.length === 1 ? '' : 's'} tagged <span class="mono">{tag}</span>. <a href="/blog/">All posts →</a></p>
+    </header>
+    <section class="section section-tight">
+      {posts.map((post) => <PostItem post={post} headingLevel="h2" />)}
+    </section>
+  </div>
+</BaseLayout>

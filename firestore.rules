@@ -1,0 +1,29 @@
+rules_version = '2';
+
+// Firestore security rules for the 00000 site.
+//
+// Model: published content is world-readable (the static build reads it anonymously over REST);
+// writing requires an authenticated admin. Drafts are never exposed to anonymous readers.
+//
+// Deploy with:  firebase deploy --only firestore:rules
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Blog posts: anyone can read PUBLISHED posts; only signed-in admins can read drafts or write.
+    match /posts/{id} {
+      allow read: if resource.data.draft == false || request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Certifications: world-readable, admin-writable.
+    match /certifications/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Everything else is closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

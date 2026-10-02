@@ -1,0 +1,62 @@
+---
+import { formatDate, readingTime, type Post } from '@/lib/content';
+import TagList from './TagList.astro';
+
+interface Props {
+  post: Post;
+  headingLevel?: 'h2' | 'h3';
+}
+const { post, headingLevel = 'h3' } = Astro.props;
+const H = headingLevel;
+---
+
+<article class="post-item">
+  <div class="meta label">
+    <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+    <span aria-hidden="true">·</span>
+    <span>{readingTime(post.body)}</span>
+  </div>
+  <div class="body">
+    <H class="title"><a href={`/blog/${post.id}/`}>{post.data.title}</a></H>
+    <p>{post.data.description}</p>
+    <TagList tags={post.data.tags} linked />
+  </div>
+</article>
+
+<style>
+  .post-item {
+    display: grid;
+    gap: 0.5rem 2rem;
+    padding-block: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .meta {
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 0.3rem;
+    white-space: nowrap;
+  }
+  .title {
+    font-size: 1.2rem;
+    margin: 0 0 0.35rem;
+  }
+  .title a {
+    text-decoration: none;
+  }
+  p {
+    color: var(--muted);
+    margin: 0 0 0.75rem;
+  }
+  @media (min-width: 48rem) {
+    .post-item {
+      grid-template-columns: 11rem 1fr;
+    }
+    .meta {
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .meta [aria-hidden] {
+      display: none;
+    }
+  }
+</style>

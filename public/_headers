@@ -1,0 +1,26 @@
+# Security headers for Cloudflare Pages (also understood by Netlify).
+# The script/style hash lists in the CSP below are filled in at build time by
+# src/integrations/csp-hashes.mjs with the SHA-256 of every inline script and style.
+# No 'unsafe-inline', no 'unsafe-eval', no third-party origins.
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' {{SCRIPT_HASHES}}; style-src 'self' {{STYLE_HASHES}}; img-src 'self'; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), browsing-topics=()
+  Strict-Transport-Security: max-age=31536000
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+
+# The admin page talks to Firebase, so it drops the global CSP and ships its own
+# (a <meta> CSP in src/pages/admin/index.astro). It is never indexed.
+/admin
+  ! Content-Security-Policy
+  X-Robots-Tag: noindex, nofollow
+/admin/*
+  ! Content-Security-Policy
+  X-Robots-Tag: noindex, nofollow
+
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

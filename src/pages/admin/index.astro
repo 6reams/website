@@ -1,0 +1,354 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+// This page talks to Firebase, so it ships its own CSP (the global strict CSP is removed for
+// /admin in public/_headers). Still no 'unsafe-inline' for scripts — only hashed inline + bundled.
+const metaCsp = [
+  "default-src 'self'",
+  "script-src 'self' __INLINE_SCRIPT_HASHES__",
+  "style-src 'self' __INLINE_STYLE_HASHES__",
+  "img-src 'self' data: blob:",
+  "font-src 'self'",
+  "connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebaseinstallations.googleapis.com https://api.cloudflare.com",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join('; ');
+---
+
+<BaseLayout title="Admin" description="Private content editor." noindex metaCsp={metaCsp}>
+  <div class="container prose-width">
+    <header class="page-head">
+      <p class="eyebrow">Private</p>
+      <h1>Content admin</h1>
+      <p>Sign in to add a blog post or a certification. Entries are saved to Firestore; the live site picks them up on the next build.</p>
+    </header>
+
+    <div id="admin-unconfigured" class="callout" hidden>
+      <strong>Firebase isn't configured.</strong> Set <code>PUBLIC_FIREBASE_*</code> in your environment
+      (see <code>.env.example</code> and the README) and redeploy to use this page.
+    </div>
+
+    <!-- Sign in -->
+    <section id="admin-login" class="section section-tight" hidden>
+      <h2>Sign in</h2>
+      <form id="login-form" autocomplete="on">
+        <div class="field">
+          <label for="login-email">Email</label>
+          <input id="login-email" type="email" required autocomplete="username" />
+        </div>
+        <div class="field">
+          <label for="login-password">Password</label>
+          <input id="login-password" type="password" required autocomplete="current-password" />
+        </div>
+        <button class="btn btn-primary" type="submit">Sign in</button>
+        <p id="login-error" class="status-bad mono" role="alert" hidden></p>
+      </form>
+    </section>
+
+    <!-- Editor -->
+    <section id="admin-app" class="section section-tight" hidden>
+      <div class="who">
+        <span class="label">Signed in as <span id="who-email" class="mono"></span></span>
+        <button id="signout" class="btn btn-sm" type="button">Sign out</button>
+      </div>
+
+      <div class="tabs" role="tablist">
+        <button class="tab is-active" type="button" data-tab="post" role="tab">New post</button>
+        <button class="tab" type="button" data-tab="cert" role="tab">New certification</button>
+      </div>
+
+      <!-- Post form -->
+      <form id="post-form" class="panel" data-pane="post">
+        <div class="field">
+          <label for="p-title">Title</label>
+          <input id="p-title" type="text" required />
+        </div>
+        <div class="field">
+          <label for="p-desc">Description</label>
+          <input id="p-desc" type="text" required />
+        </div>
+        <div class="two">
+          <div class="field">
+            <label for="p-date">Date</label>
+            <input id="p-date" type="date" required />
+          </div>
+          <div class="field">
+            <label for="p-tags">Tags (comma-separated)</label>
+            <input id="p-tags" type="text" placeholder="active-directory, web" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="p-body">Body (Markdown)</label>
+          <textarea id="p-body" required placeholder="## Heading&#10;&#10;Write in Markdown…"></textarea>
+        </div>
+        <label class="check"><input id="p-draft" type="checkbox" /> Save as draft (won't publish)</label>
+        <div class="btn-row">
+          <button class="btn btn-primary" type="submit">Save post</button>
+        </div>
+        <p class="status" data-status role="status" hidden></p>
+      </form>
+
+      <!-- Cert form -->
+      <form id="cert-form" class="panel" data-pane="cert" hidden>
+        <div class="two">
+          <div class="field">
+            <label for="c-abbr">Short code</label>
+            <input id="c-abbr" type="text" required placeholder="CPTS" />
+          </div>
+          <div class="field">
+            <label for="c-order">Order</label>
+            <input id="c-order" type="number" value="10" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="c-name">Full name</label>
+          <input id="c-name" type="text" required placeholder="Certified Penetration Testing Specialist" />
+        </div>
+        <div class="two">
+          <div class="field">
+            <label for="c-issuer">Issuer</label>
+            <input id="c-issuer" type="text" required placeholder="Hack The Box" />
+          </div>
+          <div class="field">
+            <label for="c-date">Issue date</label>
+            <input id="c-date" type="date" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="c-url">Credential URL</label>
+          <input id="c-url" type="url" placeholder="https://…" />
+        </div>
+        <div class="field">
+          <label for="c-desc">Description (optional)</label>
+          <textarea id="c-desc"></textarea>
+        </div>
+        <div class="field">
+          <label for="c-badge">Badge image (optional — resized to a small WebP in your browser)</label>
+          <input id="c-badge" type="file" accept="image/*" />
+          <img id="c-preview" alt="Badge preview" width="72" height="72" hidden />
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" type="submit">Save certification</button>
+        </div>
+        <p class="status" data-status role="status" hidden></p>
+      </form>
+
+      <section class="publish">
+        <h2>Publish</h2>
+        <p class="muted">Saved entries go live on the next build. If you set a deploy hook, trigger one now:</p>
+        <button id="publish" class="btn" type="button" disabled>Trigger rebuild</button>
+        <p id="publish-note" class="label"></p>
+      </section>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import { isConfigured, firebase, DEPLOY_HOOK } from '@/lib/firebase-client';
+  import {
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut,
+    type User,
+  } from 'firebase/auth';
+  import { collection, addDoc, Timestamp } from 'firebase/firestore';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const show = (el: HTMLElement | null, visible: boolean) => el && (el.hidden = !visible);
+
+  if (!isConfigured()) {
+    show($('admin-unconfigured'), true);
+  } else {
+    const { auth, db } = firebase();
+
+    // ---- auth state ----
+    onAuthStateChanged(auth, (user: User | null) => {
+      show($('admin-login'), !user);
+      show($('admin-app'), !!user);
+      if (user) $('who-email').textContent = user.email ?? '';
+    });
+
+    $('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const err = $('login-error');
+      show(err, false);
+      try {
+        await signInWithEmailAndPassword(
+          auth,
+          ($('login-email') as HTMLInputElement).value,
+          ($('login-password') as HTMLInputElement).value,
+        );
+      } catch (ex) {
+        show(err, true);
+        err.textContent = (ex as Error).message.replace('Firebase: ', '');
+      }
+    });
+
+    $('signout').addEventListener('click', () => signOut(auth));
+
+    // ---- tabs ----
+    document.querySelectorAll<HTMLButtonElement>('.tab').forEach((tab) =>
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('is-active', t === tab));
+        document.querySelectorAll<HTMLElement>('[data-pane]').forEach((p) => (p.hidden = p.dataset.pane !== tab.dataset.tab));
+      }),
+    );
+
+    const setStatus = (form: HTMLElement, msg: string, ok: boolean) => {
+      const el = form.querySelector<HTMLElement>('[data-status]')!;
+      el.hidden = false;
+      el.textContent = msg;
+      el.className = `status ${ok ? 'status-ok' : 'status-bad'}`;
+    };
+
+    // ---- save post ----
+    $('post-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.currentTarget as HTMLFormElement;
+      try {
+        const tags = ($('p-tags') as HTMLInputElement).value.split(',').map((t) => t.trim()).filter(Boolean);
+        await addDoc(collection(db, 'posts'), {
+          title: ($('p-title') as HTMLInputElement).value,
+          description: ($('p-desc') as HTMLInputElement).value,
+          date: Timestamp.fromDate(new Date(($('p-date') as HTMLInputElement).value)),
+          tags,
+          draft: ($('p-draft') as HTMLInputElement).checked,
+          body: ($('p-body') as HTMLTextAreaElement).value,
+          createdAt: Timestamp.now(),
+        });
+        form.reset();
+        setStatus(form, 'Saved. It will appear after the next build.', true);
+      } catch (ex) {
+        setStatus(form, (ex as Error).message, false);
+      }
+    });
+
+    // ---- badge resize ----
+    let badgeData = '';
+    $('c-badge').addEventListener('change', async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      const preview = $('c-preview') as HTMLImageElement;
+      if (!file) return;
+      const bitmap = await createImageBitmap(file);
+      const size = 144;
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d')!;
+      const scale = Math.min(size / bitmap.width, size / bitmap.height);
+      const w = bitmap.width * scale;
+      const h = bitmap.height * scale;
+      ctx.drawImage(bitmap, (size - w) / 2, (size - h) / 2, w, h);
+      badgeData = canvas.toDataURL('image/webp', 0.85);
+      preview.src = badgeData;
+      preview.hidden = false;
+    });
+
+    // ---- save cert ----
+    $('cert-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.currentTarget as HTMLFormElement;
+      try {
+        const dateVal = ($('c-date') as HTMLInputElement).value;
+        await addDoc(collection(db, 'certifications'), {
+          name: ($('c-name') as HTMLInputElement).value,
+          abbr: ($('c-abbr') as HTMLInputElement).value,
+          issuer: ($('c-issuer') as HTMLInputElement).value,
+          date: dateVal ? Timestamp.fromDate(new Date(dateVal)) : null,
+          credentialUrl: ($('c-url') as HTMLInputElement).value,
+          description: ($('c-desc') as HTMLTextAreaElement).value,
+          order: Number(($('c-order') as HTMLInputElement).value) || 100,
+          badgeData: badgeData || null,
+          createdAt: Timestamp.now(),
+        });
+        form.reset();
+        ($('c-preview') as HTMLImageElement).hidden = true;
+        badgeData = '';
+        setStatus(form, 'Saved. It will appear after the next build.', true);
+      } catch (ex) {
+        setStatus(form, (ex as Error).message, false);
+      }
+    });
+
+    // ---- publish (optional deploy hook) ----
+    const publishBtn = $('publish') as HTMLButtonElement;
+    const note = $('publish-note');
+    if (DEPLOY_HOOK) {
+      publishBtn.disabled = false;
+      publishBtn.addEventListener('click', async () => {
+        publishBtn.disabled = true;
+        try {
+          await fetch(DEPLOY_HOOK, { method: 'POST' });
+          note.textContent = 'Rebuild triggered. The site updates in a minute or two.';
+        } catch (ex) {
+          note.textContent = `Could not trigger rebuild: ${(ex as Error).message}`;
+        } finally {
+          publishBtn.disabled = false;
+        }
+      });
+    } else {
+      note.textContent = 'No deploy hook set (PUBLIC_DEPLOY_HOOK). Trigger a deploy from your dashboard, or push to your repo.';
+    }
+  }
+</script>
+
+<style>
+  .who {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .tab {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg-elev);
+    color: var(--muted);
+    font: 500 0.9rem/1 var(--font-sans);
+    cursor: pointer;
+  }
+  .tab.is-active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .panel {
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elev);
+  }
+  .two {
+    display: grid;
+    gap: 1rem;
+  }
+  #c-preview {
+    margin-top: 0.75rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+  }
+  .publish {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .status {
+    margin-top: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+  @media (min-width: 40rem) {
+    .two {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

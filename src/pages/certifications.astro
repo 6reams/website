@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CertCard from '../components/CertCard.astro';
+import { getCerts } from '@/lib/content';
+import { site } from '@config';
+
+const certs = await getCerts();
+---
+
+<BaseLayout title="Certifications" description={`${certs.length} offensive-security and application-security certifications held by ${site.name}.`}>
+  <div class="container">
+    <header class="page-head">
+      <p class="eyebrow">Credentials</p>
+      <h1>Certifications</h1>
+      <p>{certs.length} industry certifications across offensive security, red teaming and application security. Verify links open the issuer's credential page.</p>
+    </header>
+    <section class="section section-tight">
+      <div class="grid cert-grid">
+        {certs.map((cert) => <CertCard cert={cert} />)}
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .cert-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr));
+  }
+</style>
