@@ -1,6 +1,10 @@
 /* ==========================================================================
    00000 — design tokens + base styles. Plain CSS, no framework.
-   The accent color comes from site.config.ts (injected as --accent-light/--accent-dark).
+   Dark-only. The five background/surface fills are the fixed brand palette:
+     #151d27  #141a24  #141b28  #111923  #0c1018
+   Text uses off-white/grey neutrals and borders use faint white so the dark
+   surfaces stay readable. The accent (one soft slate-blue) comes from
+   site.config.ts, injected as --accent.
    ========================================================================== */
 
 :root {
@@ -14,58 +18,28 @@
   --gutter: clamp(1rem, 4vw, 2rem);
   --space: clamp(4rem, 10vw, 7rem);
 
-  /* light */
-  --bg: #ffffff;
-  --bg-soft: #f7f6fb;
-  --bg-elev: #ffffff;
-  --fg: #15141a;
-  --muted: #5b5966;
-  --border: #e7e5ef;
-  --border-strong: #d4d1e0;
-  --accent: var(--accent-light);
-  --accent-fg: #ffffff;
-  --accent-soft: color-mix(in srgb, var(--accent) 9%, transparent);
-  --glow: color-mix(in srgb, var(--accent) 14%, transparent);
-  --ok: #15803d;
-  --warn: #b45309;
-  --bad: #b91c1c;
+  /* brand palette — backgrounds and surfaces only */
+  --bg: #0c1018;        /* page background (darkest) */
+  --bg-soft: #111923;   /* inputs, code, subtle panels */
+  --bg-elev: #151d27;   /* cards, header (lightest of the five) */
+  --bg-elev-2: #141b28; /* nested surfaces */
 
-  color-scheme: light;
-}
+  /* neutrals for text + structure */
+  --fg: #e7ebf1;
+  --muted: #9aa6b4;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --bg: #0b0a10;
-    --bg-soft: #121119;
-    --bg-elev: #15141d;
-    --fg: #ecebf2;
-    --muted: #a3a1b1;
-    --border: #24222f;
-    --border-strong: #353243;
-    --accent: var(--accent-dark);
-    --accent-fg: #120f1c;
-    --glow: color-mix(in srgb, var(--accent) 18%, transparent);
-    --ok: #4ade80;
-    --warn: #fbbf24;
-    --bad: #f87171;
-    color-scheme: dark;
-  }
-}
+  /* one soft accent */
+  --accent-fg: #0c1018;
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
+  --glow: color-mix(in srgb, var(--accent) 16%, transparent);
 
-:root[data-theme='dark'] {
-  --bg: #0b0a10;
-  --bg-soft: #121119;
-  --bg-elev: #15141d;
-  --fg: #ecebf2;
-  --muted: #a3a1b1;
-  --border: #24222f;
-  --border-strong: #353243;
-  --accent: var(--accent-dark);
-  --accent-fg: #120f1c;
-  --glow: color-mix(in srgb, var(--accent) 18%, transparent);
-  --ok: #4ade80;
-  --warn: #fbbf24;
-  --bad: #f87171;
+  /* functional status tones (password strength, token expiry) — kept muted */
+  --ok: #86c2a1;
+  --warn: #d8bd8a;
+  --bad: #d99090;
+
   color-scheme: dark;
 }
 
@@ -221,9 +195,8 @@ pre {
 
 /* ---------- small type ---------- */
 .label {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -231,17 +204,12 @@ pre {
   color: var(--accent);
 }
 .eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--accent);
+  display: inline-block;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
   margin-bottom: 1rem;
-}
-.eyebrow::before {
-  content: '//';
-  opacity: 0.6;
 }
 .muted {
   color: var(--muted);
@@ -262,7 +230,6 @@ pre {
   margin: 0;
 }
 .link-arrow {
-  font-family: var(--font-mono);
   font-size: 0.85rem;
   text-decoration: none;
   color: var(--muted);
@@ -395,8 +362,8 @@ pre {
   position: relative;
   z-index: 1;
   display: inline-block;
-  font-family: var(--font-mono);
   font-size: 0.72rem;
+  letter-spacing: 0.02em;
   line-height: 1;
   padding: 0.4rem 0.55rem;
   border-radius: 6px;
@@ -460,7 +427,6 @@ a.tag:hover {
   border-bottom: 1px solid var(--border);
 }
 .prose th {
-  font-family: var(--font-mono);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;

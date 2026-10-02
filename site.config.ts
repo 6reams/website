@@ -46,17 +46,12 @@ export const site = {
     keyUrl: '/pgp.asc',
   },
 
-  /** Terminal prompt on the home page: `${terminalUser}@${brand}:~$` */
-  terminalUser: 'ahmad',
-
   /**
-   * Accent color — the only color besides neutrals. Use a darker shade for light mode
-   * and a lighter shade for dark mode so both pass WCAG AA contrast.
+   * Accent color — the one soft color besides the dark slate surfaces and neutral text.
+   * Used for links, buttons and small highlights. Keep it light enough to pass WCAG AA
+   * contrast on the dark background (#0c1018).
    */
-  accent: {
-    light: '#7c3aed',
-    dark: '#a78bfa',
-  },
+  accent: '#8ba6c7',
 
   /** Default locale for <html lang> and RSS. */
   lang: 'en',

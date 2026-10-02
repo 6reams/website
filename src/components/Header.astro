@@ -1,6 +1,5 @@
 ---
 import { site } from '@config';
-import ThemeToggle from './ThemeToggle.astro';
 
 const nav = [
   { href: '/projects/', label: 'Projects' },
@@ -16,7 +15,7 @@ const path = Astro.url.pathname;
 <header class="site-header">
   <div class="container bar">
     <a class="brand" href="/" aria-label={`${site.brand} — home`}>
-      <span class="brand-mark" aria-hidden="true">&gt;_</span>
+      <span class="brand-mark" aria-hidden="true"></span>
       <span>{site.brand}</span>
     </a>
     <nav aria-label="Main">
@@ -32,7 +31,6 @@ const path = Astro.url.pathname;
         }
       </ul>
     </nav>
-    <ThemeToggle />
   </div>
 </header>
 
@@ -41,15 +39,15 @@ const path = Astro.url.pathname;
     position: sticky;
     top: 0;
     z-index: 50;
-    background: color-mix(in srgb, var(--bg) 82%, transparent);
-    backdrop-filter: saturate(160%) blur(12px);
-    -webkit-backdrop-filter: saturate(160%) blur(12px);
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
   }
   .bar {
     display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-areas: 'brand toggle' 'nav nav';
+    grid-template-columns: 1fr;
+    grid-template-areas: 'brand' 'nav';
     align-items: center;
     gap: 0.25rem 1rem;
     padding-block: 0.75rem 0.25rem;
@@ -58,21 +56,18 @@ const path = Astro.url.pathname;
     grid-area: brand;
     display: inline-flex;
     align-items: center;
-    gap: 0.55rem;
-    font: 700 1.05rem/1 var(--font-mono);
-    letter-spacing: 0.04em;
+    gap: 0.6rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
     text-decoration: none;
     justify-self: start;
   }
   .brand-mark {
-    display: inline-grid;
-    place-items: center;
-    width: 1.9rem;
-    height: 1.9rem;
-    border-radius: 8px;
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 3px;
     background: var(--accent);
-    color: var(--accent-fg);
-    font-size: 0.75rem;
   }
   nav {
     grid-area: nav;
@@ -105,15 +100,12 @@ const path = Astro.url.pathname;
     background: var(--bg-soft);
   }
   nav a[aria-current='page'] {
-    color: var(--accent);
-  }
-  :global(.theme-toggle) {
-    grid-area: toggle;
+    color: var(--fg);
   }
   @media (min-width: 52rem) {
     .bar {
-      grid-template-columns: auto 1fr auto;
-      grid-template-areas: 'brand nav toggle';
+      grid-template-columns: auto 1fr;
+      grid-template-areas: 'brand nav';
       padding-block: 0.85rem;
     }
     nav {

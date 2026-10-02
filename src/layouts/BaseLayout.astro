@@ -14,7 +14,7 @@ export interface Props extends SeoProps {
 }
 
 const { metaCsp, ...seo } = Astro.props;
-const accentCss = `:root{--accent-light:${site.accent.light};--accent-dark:${site.accent.dark}}`;
+const accentCss = `:root{--accent:${site.accent}}`;
 ---
 
 <!doctype html>
@@ -23,16 +23,11 @@ const accentCss = `:root{--accent-light:${site.accent.light};--accent-dark:${sit
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     {metaCsp && import.meta.env.PROD && <meta http-equiv="Content-Security-Policy" content={metaCsp} />}
-    <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0b0a10" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0c1018" />
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <!-- Applies the saved theme before first paint (no flash). Allowed by a CSP hash, not 'unsafe-inline'. -->
-    <script is:inline>
-      try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}
-    </script>
     <style is:inline set:html={accentCss}></style>
     <Seo {...seo} />
   </head>

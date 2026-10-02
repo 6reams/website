@@ -5,8 +5,8 @@ const year = new Date().getFullYear();
 
 <footer class="site-footer">
   <div class="container foot">
-    <p class="mono small">
-      <span class="accent">$</span> echo "© {year} {site.name}" <span class="muted">· {site.url.replace('https://', '')}</span>
+    <p class="small">
+      © {year} {site.name} <span class="muted">· {site.url.replace('https://', '')}</span>
     </p>
     <ul class="links">
       {site.email && <li><a href={`mailto:${site.email}`}>Email</a></li>}
@@ -58,8 +58,7 @@ const year = new Date().getFullYear();
   }
   .note {
     margin: 1rem 0 0;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     color: var(--muted);
   }
 </style>
