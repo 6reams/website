@@ -312,7 +312,8 @@ pre {
 }
 .card:hover {
   border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
-  box-shadow: 0 10px 30px -18px var(--glow);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px -12px color-mix(in srgb, var(--accent) 18%, rgba(0,0,0,0.4));
 }
 .card h3 {
   margin: 0;
@@ -585,4 +586,65 @@ main:focus {
 }
 .mt-3 {
   margin-top: 1.25rem;
+}
+
+/* ---------- scroll-driven reveal ---------- */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  [data-animate] {
+    animation: fade-up 0.6s ease both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 32%;
+  }
+}
+
+/* ---------- float keyframe (hero orb) ---------- */
+@keyframes float {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(-3rem, 2.5rem) scale(1.07); }
+}
+
+/* ---------- pulse (brand mark) ---------- */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+  50%       { box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 0%, transparent); }
+}
+
+/* ---------- gradient text ---------- */
+.gradient-text {
+  background: linear-gradient(135deg, var(--fg) 30%, var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ---------- status pill ---------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  padding: 0.3rem 0.85rem;
+}
+.pill-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--ok);
+  flex: none;
 }

@@ -7,23 +7,43 @@ import { site } from '@config';
 const certs = await getCerts();
 ---
 
-<BaseLayout title="Certifications" description={`${certs.length} offensive-security and application-security certifications held by ${site.name}.`}>
+<BaseLayout
+  title="Certifications"
+  description={`${certs.length} offensive-security and application-security certifications held by ${site.name}.`}
+>
   <div class="container">
     <header class="page-head">
-      <p class="eyebrow">Credentials</p>
-      <h1>Certifications</h1>
-      <p>{certs.length} industry certifications across offensive security, red teaming and application security. Verify links open the issuer's credential page.</p>
+      <div class="pill cert-count-pill">
+        <span class="pill-dot" aria-hidden="true"></span>
+        {certs.length} certifications
+      </div>
+      <h1>Credentials</h1>
+      <p>Industry certifications across offensive security, red teaming and application security. Click any badge to verify the credential.</p>
     </header>
-    <section class="section section-tight">
-      <div class="grid cert-grid">
+  </div>
+
+  <section class="section section-tight">
+    <div class="container">
+      <div class="badge-grid">
         {certs.map((cert) => <CertCard cert={cert} />)}
       </div>
-    </section>
-  </div>
+    </div>
+  </section>
 </BaseLayout>
 
 <style>
-  .cert-grid {
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr));
+  .cert-count-pill {
+    margin-bottom: 1.25rem;
+  }
+  .badge-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr));
+    gap: 1rem;
+  }
+  @media (min-width: 48rem) {
+    .badge-grid {
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+      gap: 1.25rem;
+    }
   }
 </style>

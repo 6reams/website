@@ -11,8 +11,8 @@ const H = headingLevel;
 const { title, description, tags, date } = project.data;
 ---
 
-<article class="card">
-  <div class="label">{date.getUTCFullYear()}</div>
+<article class="card proj-card" data-animate>
+  <div class="proj-year">{date.getUTCFullYear()}</div>
   <H><a class="stretched" href={`/projects/${project.id}/`}>{title}</a></H>
   <p>{description}</p>
   <div class="card-foot">
@@ -20,3 +20,32 @@ const { title, description, tags, date } = project.data;
     <span class="link-arrow" aria-hidden="true">Read</span>
   </div>
 </article>
+
+<style>
+  .proj-card {
+    /* accent line slides in from bottom on hover */
+    overflow: hidden;
+  }
+  .proj-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 30%, transparent));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+  .proj-card:hover::after {
+    transform: scaleX(1);
+  }
+  .proj-year {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+  }
+</style>
