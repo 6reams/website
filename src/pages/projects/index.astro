@@ -21,8 +21,11 @@ const fmtDate = (d: Date) =>
       {projects.map((project) => (
         <a class="project-row" href={`/projects/${project.id}/`}>
           <div class="project-thumb" aria-hidden="true">
-            <div class="thumb-pattern"></div>
-            <span class="thumb-label">{project.data.title.charAt(0)}</span>
+            {project.data.image ? (
+              <img class="thumb-img" src={project.data.image} alt="" width="100" height="72" loading="lazy" />
+            ) : (
+              <><div class="thumb-pattern"></div><span class="thumb-label">{project.data.title.charAt(0)}</span></>
+            )}
           </div>
           <div class="project-info">
             <div class="project-top">
@@ -99,6 +102,11 @@ const fmtDate = (d: Date) =>
   }
   .project-row:hover .project-thumb {
     border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+  }
+  .thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   .thumb-pattern {
     position: absolute;
