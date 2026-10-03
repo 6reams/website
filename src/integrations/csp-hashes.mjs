@@ -3,8 +3,7 @@
  *
  * After the build, scans every HTML file for inline <script> and <style> blocks, computes
  * their SHA-256 hashes and writes them into dist/_headers (replacing {{SCRIPT_HASHES}} and
- * {{STYLE_HASHES}} in public/_headers). Pages that carry their own <meta> CSP (e.g. /admin)
- * get __INLINE_SCRIPT_HASHES__ / __INLINE_STYLE_HASHES__ replaced with their own hashes.
+ * {{STYLE_HASHES}} in public/_headers).
  *
  * This lets the site run a strict CSP with no 'unsafe-inline' anywhere.
  */

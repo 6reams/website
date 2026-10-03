@@ -6,12 +6,9 @@ import '../styles/global.css';
 import '../styles/shiki.generated.css';
 import { site } from '@config';
 import Seo, { type Props as SeoProps } from '../components/Seo.astro';
-export interface Props extends SeoProps {
-  /** Optional page-specific <meta> CSP (fallback when header-based CSP can't be used). Production only. */
-  metaCsp?: string;
-}
+export type Props = SeoProps;
 
-const { metaCsp, ...seo } = Astro.props;
+const seo = Astro.props;
 const accentCss = `:root{--accent:${site.accent}}`;
 ---
 
@@ -20,7 +17,6 @@ const accentCss = `:root{--accent:${site.accent}}`;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    {metaCsp && import.meta.env.PROD && <meta http-equiv="Content-Security-Policy" content={metaCsp} />}
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#1d1d1d" />
     <meta name="generator" content={Astro.generator} />

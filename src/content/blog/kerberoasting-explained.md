@@ -7,7 +7,7 @@ draft: false
 ---
 
 > **Sample post.** This is example content so you can see the layout. Edit or delete it in
-> `src/content/blog/`, or publish your own posts from `/admin`.
+> `src/content/blog/`.
 
 Kerberoasting is one of the first things I look for on an internal Active Directory assessment.
 It's quiet, it needs nothing more than an ordinary domain account, and it still works far too

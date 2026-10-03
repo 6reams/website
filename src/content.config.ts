@@ -1,16 +1,10 @@
 import { defineCollection } from 'astro:content';
 import { glob, file } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { withSupabase } from './lib/supabase-loader';
 
-/** Blog posts: src/content/blog/*.md(x)  +  Supabase "posts" (published only). */
+/** Blog posts: src/content/blog/*.md(x). */
 const blog = defineCollection({
-  loader: withSupabase({
-    local: glob({ pattern: '**/*.{md,mdx}', base: './src/content/blog' }),
-    table: 'posts',
-    where: { column: 'draft', value: false },
-    bodyField: 'body',
-  }),
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/blog' }),
   schema: z.object({
     title: z.string(),
     description: z.string(),
@@ -18,7 +12,6 @@ const blog = defineCollection({
     updated: z.coerce.date().optional(),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
-    source: z.enum(['local', 'supabase']).default('local'),
   }),
 });
 
@@ -34,19 +27,15 @@ const projects = defineCollection({
     image: z.string().optional(),
     date: z.coerce.date(),
     featured: z.boolean().default(false),
-    /** Lower comes first among featured projects. */
     order: z.number().default(100),
     private: z.boolean().default(false),
     draft: z.boolean().default(false),
   }),
 });
 
-/** Certifications: src/data/certifications.json  +  Supabase "certifications". */
+/** Certifications: src/data/certifications.json. */
 const certifications = defineCollection({
-  loader: withSupabase({
-    local: file('src/data/certifications.json'),
-    table: 'certifications',
-  }),
+  loader: file('src/data/certifications.json'),
   schema: z.object({
     name: z.string(),
     abbr: z.string(),
@@ -57,7 +46,6 @@ const certifications = defineCollection({
     badge: z.string().optional(),
     badgeData: z.string().optional(),
     order: z.number().default(100),
-    source: z.enum(['local', 'supabase']).default('local'),
   }),
 });
 
