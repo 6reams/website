@@ -36,6 +36,7 @@ const projects = defineCollection({
     featured: z.boolean().default(false),
     /** Lower comes first among featured projects. */
     order: z.number().default(100),
+    private: z.boolean().default(false),
     draft: z.boolean().default(false),
   }),
 });
