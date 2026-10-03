@@ -14,10 +14,10 @@
   --gutter: clamp(1.25rem, 4vw, 2rem);
   --space: clamp(5rem, 12vw, 8rem);
 
-  --bg: #000000;
-  --bg-soft: #1d1d1d;
-  --bg-elev: #272727;
-  --bg-elev-2: #2e2f30;
+  --bg: #1d1d1d;
+  --bg-soft: #272727;
+  --bg-elev: #2e2f30;
+  --bg-elev-2: #363636;
 
   --fg: #e8ecf2;
   --muted: #8a97a8;
