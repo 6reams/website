@@ -39,6 +39,3 @@ module that implements a common interface, so new sources plug in without touchi
 A reusable recon framework that replaced a pile of ad-hoc scripts with one consistent workflow. It
 cut the time to produce an initial attack-surface map dramatically, surfaced correlations that were
 easy to miss by hand, and is **open-sourced on GitHub** so others can extend it.
-
-> Want the full writeup? This page is a template — replace the repo link above with the live Spylo
-> repository and add screenshots or a demo GIF in `src/content/projects/`.
