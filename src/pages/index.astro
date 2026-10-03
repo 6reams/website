@@ -3,15 +3,19 @@ import { site } from '@config';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getProjects } from '@/lib/content';
 import { getCerts } from '@/lib/content';
+import { timeline } from '@/data/profile';
 
 const projects = (await getProjects()).filter((p) => p.data.featured).slice(0, 4);
-const certs = (await getCerts()).slice(0, 9);
+const allCerts = await getCerts();
+const featuredIds = ['cpts', 'emapt', 'oswp', 'crtp'];
+const certs = featuredIds.map((id) => allCerts.find((c) => c.id === id)).filter(Boolean);
+const workItems = timeline.filter((item) => item.kind === 'work');
 
 const fmtDate = (d: Date) =>
   `${d.getUTCFullYear()}/${String(d.getUTCMonth() + 1).padStart(2, '0')}/${String(d.getUTCDate()).padStart(2, '0')}`;
 ---
 
-<BaseLayout hideNav>
+<BaseLayout>
   <div class="home">
 
     <!-- Hero -->
@@ -45,7 +49,7 @@ const fmtDate = (d: Date) =>
     </section>
 
     <!-- Projects -->
-    <section class="projects">
+    <section class="projects" data-animate>
       <div class="section-bar">
         <h2>Projects</h2>
         <a href="/projects/" class="section-link">All projects &rarr;</a>
@@ -70,12 +74,52 @@ const fmtDate = (d: Date) =>
       ))}
     </section>
 
-    <!-- Certs strip -->
-    <section class="certs-strip" aria-label="Certifications">
-      <span class="certs-label">Certifications</span>
-      <div class="certs-row">
-        {certs.map((c) => (
-          <span class="cert-badge" title={c.data.name}>{c.data.abbr}</span>
+    <!-- Work Experience -->
+    <section class="experience" data-animate>
+      <div class="section-bar">
+        <h2>Experience</h2>
+        <a href="/about/" class="section-link">Full timeline &rarr;</a>
+      </div>
+
+      <ol class="timeline">
+        {workItems.map((item) => (
+          <li class="tl-item">
+            <div class="tl-marker"></div>
+            <div class="tl-content">
+              <span class="tl-period">{item.period}</span>
+              <h3 class="tl-title">{item.title}</h3>
+              <p class="tl-org">{item.org}</p>
+              {item.points && (
+                <ul class="tl-points">
+                  {item.points.map((p) => <li>{p}</li>)}
+                </ul>
+              )}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <!-- Certifications -->
+    <section class="certifications" data-animate>
+      <div class="section-bar">
+        <h2>Certifications</h2>
+        <a href="/certifications/" class="section-link">All certs &rarr;</a>
+      </div>
+
+      <div class="cert-grid">
+        {certs.map((cert) => cert && (
+          <div class="cert-card">
+            <div class="cert-visual">
+              <div class="cert-icon">
+                <span class="cert-abbr-large">{cert.data.abbr}</span>
+              </div>
+            </div>
+            <div class="cert-info">
+              <strong class="cert-name">{cert.data.name}</strong>
+              <span class="cert-issuer">{cert.data.issuer}</span>
+            </div>
+          </div>
         ))}
       </div>
     </section>
@@ -296,51 +340,148 @@ const fmtDate = (d: Date) =>
     line-height: 1.6;
   }
 
-  /* -------- certs strip -------- */
-  .certs-strip {
+  /* -------- experience timeline -------- */
+  .experience {
+    padding-bottom: clamp(3rem, 6vw, 5rem);
+  }
+  .timeline {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0;
+    position: relative;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: var(--border);
+  }
+  .tl-item {
+    display: flex;
+    gap: 1.25rem;
+    padding-bottom: 2rem;
+    position: relative;
+  }
+  .tl-item:last-child {
+    padding-bottom: 0;
+  }
+  .tl-marker {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+    position: relative;
+    top: 2px;
+    z-index: 1;
+  }
+  .tl-content {
+    flex: 1;
+    min-width: 0;
+  }
+  .tl-period {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+  .tl-title {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 0 0 0.15rem;
+    line-height: 1.3;
+  }
+  .tl-org {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+  .tl-points {
+    margin: 0.5rem 0 0;
+    padding-left: 1.1rem;
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .tl-points li {
+    margin: 0.25rem 0;
+  }
+  .tl-points li::marker {
+    color: var(--accent);
+  }
+
+  /* -------- certifications -------- */
+  .certifications {
+    padding-bottom: clamp(3rem, 6vw, 5rem);
+  }
+  .cert-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  .cert-card {
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--bg-elev);
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.2s, box-shadow 0.3s;
+  }
+  .cert-card:hover {
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.4);
+  }
+  .cert-visual {
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(ellipse at 30% 30%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%),
+      var(--bg-soft);
+    border-bottom: 1px solid var(--border);
+  }
+  .cert-icon {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
-    padding-top: clamp(2rem, 4vw, 3rem);
-    padding-bottom: clamp(2rem, 4vw, 3rem);
-    border-top: 1px solid var(--border);
+    gap: 0.4rem;
   }
-  .certs-label {
+  .cert-abbr-large {
+    font: 800 1.8rem/1 var(--font-display);
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+  .cert-info {
+    padding: 0.85rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .cert-name {
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .cert-issuer {
     font-family: var(--font-mono);
     font-size: 0.68rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
     color: var(--muted);
-  }
-  .certs-row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-  .cert-badge {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    color: var(--muted);
-    padding: 0.3rem 0.55rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    transition: color 0.2s, border-color 0.2s, background 0.2s;
-    cursor: default;
-  }
-  .cert-badge:hover {
-    color: var(--accent);
-    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
-    background: color-mix(in srgb, var(--accent) 5%, transparent);
   }
 
   /* -------- home footer -------- */
   .home-footer {
     text-align: center;
     padding-top: 1rem;
+    border-top: 1px solid var(--border);
   }
   .home-footer p {
     font-family: var(--font-mono);
@@ -363,13 +504,17 @@ const fmtDate = (d: Date) =>
     animation: reveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
     animation-delay: 350ms;
   }
-  .certs-strip {
+  .experience {
     animation: reveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
     animation-delay: 450ms;
   }
-  .home-footer {
+  .certifications {
     animation: reveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
     animation-delay: 550ms;
+  }
+  .home-footer {
+    animation: reveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: 650ms;
   }
 
   /* -------- mobile -------- */
@@ -388,6 +533,12 @@ const fmtDate = (d: Date) =>
     }
     .project-row {
       gap: 1rem;
+    }
+    .cert-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .cert-abbr-large {
+      font-size: 1.4rem;
     }
   }
 </style>

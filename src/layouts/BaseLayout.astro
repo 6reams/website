@@ -6,17 +6,12 @@ import '../styles/global.css';
 import '../styles/shiki.generated.css';
 import { site } from '@config';
 import Seo, { type Props as SeoProps } from '../components/Seo.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-
 export interface Props extends SeoProps {
   /** Optional page-specific <meta> CSP (used by /admin, which talks to Firebase). Production only. */
   metaCsp?: string;
-  /** Hide header + footer for minimal pages (e.g. homepage). */
-  hideNav?: boolean;
 }
 
-const { metaCsp, hideNav, ...seo } = Astro.props;
+const { metaCsp, ...seo } = Astro.props;
 const accentCss = `:root{--accent:${site.accent}}`;
 ---
 
@@ -36,10 +31,8 @@ const accentCss = `:root{--accent:${site.accent}}`;
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    {!hideNav && <Header />}
     <main id="main" tabindex="-1">
       <slot />
     </main>
-    {!hideNav && <Footer />}
   </body>
 </html>
