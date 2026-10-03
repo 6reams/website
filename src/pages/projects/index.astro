@@ -1,22 +1,181 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ProjectCard from '../../components/ProjectCard.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
 import { getProjects } from '@/lib/content';
 
 const projects = await getProjects();
+
+const fmtDate = (d: Date) =>
+  `${d.getUTCFullYear()}/${String(d.getUTCMonth() + 1).padStart(2, '0')}/${String(d.getUTCDate()).padStart(2, '0')}`;
 ---
 
 <BaseLayout title="Projects" description="Security projects and tools — each written up as problem, approach and result.">
-  <div class="container">
-    <header class="page-head">
-      <p class="eyebrow">Work</p>
-      <h1>Projects</h1>
-      <p>Things I've built and broken. Each write-up follows the same shape: the problem, my approach, and the result.</p>
+  <div class="container inner-page">
+    <Breadcrumb />
+    <header class="page-header">
+      <h1>All Projects</h1>
+      <p>Showcase of applications, systems, and digital experiments.</p>
     </header>
-    <section class="section section-snug">
-      <div class="grid">
-        {projects.map((project) => <ProjectCard project={project} headingLevel="h2" />)}
-      </div>
+
+    <section class="project-list">
+      {projects.map((project) => (
+        <a class="project-row" href={`/projects/${project.id}/`}>
+          <div class="project-thumb" aria-hidden="true">
+            <div class="thumb-pattern"></div>
+            <span class="thumb-label">{project.data.title.charAt(0)}</span>
+          </div>
+          <div class="project-info">
+            <div class="project-top">
+              <h2>{project.data.title}</h2>
+              <time class="project-date" datetime={project.data.date.toISOString()}>
+                {fmtDate(project.data.date)}
+              </time>
+            </div>
+            <p>{project.data.description}</p>
+          </div>
+        </a>
+      ))}
     </section>
   </div>
 </BaseLayout>
+
+<style>
+  .inner-page {
+    max-width: 52rem;
+    padding-bottom: 4rem;
+  }
+  .page-header {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 0 0 0.5rem;
+  }
+  .page-header p {
+    color: var(--muted);
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  .project-list {
+    display: flex;
+    flex-direction: column;
+  }
+  .project-row {
+    display: flex;
+    gap: 1.25rem;
+    padding: 1.5rem 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    text-decoration: none;
+    color: inherit;
+    background: var(--bg-elev);
+    transition: border-color 0.3s, transform 0.2s;
+  }
+  .project-row:hover {
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+    transform: translateX(4px);
+  }
+  .project-row:hover .thumb-label {
+    opacity: 1;
+    color: var(--accent);
+  }
+
+  .project-thumb {
+    flex-shrink: 0;
+    width: 100px;
+    height: 72px;
+    border-radius: 8px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    position: relative;
+    transition: border-color 0.3s;
+  }
+  .project-row:hover .project-thumb {
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+  }
+  .thumb-pattern {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle, color-mix(in srgb, var(--accent) 18%, transparent) 1px, transparent 1px);
+    background-size: 10px 10px;
+    background-position: 5px 5px;
+    opacity: 0.7;
+  }
+  .thumb-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--muted);
+    opacity: 0.15;
+    transition: opacity 0.3s, color 0.3s;
+  }
+  .project-row:nth-of-type(2n) .thumb-pattern {
+    background-image:
+      linear-gradient(45deg, color-mix(in srgb, var(--accent) 8%, transparent) 25%, transparent 25%),
+      linear-gradient(-45deg, color-mix(in srgb, var(--accent) 8%, transparent) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, color-mix(in srgb, var(--accent) 8%, transparent) 75%),
+      linear-gradient(-45deg, transparent 75%, color-mix(in srgb, var(--accent) 8%, transparent) 75%);
+    background-size: 12px 12px;
+    background-position: 0 0, 0 6px, 6px -6px, -6px 0;
+  }
+
+  .project-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .project-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.3rem;
+  }
+  .project-top h2 {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.3;
+  }
+  .project-date {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .project-info p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 36rem) {
+    .project-thumb {
+      width: 72px;
+      height: 52px;
+    }
+    .project-top {
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+    .project-row {
+      gap: 1rem;
+      padding: 1.25rem 1rem;
+    }
+  }
+</style>

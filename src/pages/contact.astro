@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
 import { site } from '@config';
 
 const channels = [
@@ -10,14 +11,14 @@ const channels = [
 ---
 
 <BaseLayout title="Contact" description={`Get in touch with ${site.name}.`}>
-  <div class="container prose-width">
-    <header class="page-head">
-      <p class="eyebrow">Say hello</p>
+  <div class="container inner-page prose-width">
+    <Breadcrumb />
+    <header class="page-header">
       <h1>Contact</h1>
       <p>Open to penetration testing work, red team engagements and security training. The fastest way to reach me is email.</p>
     </header>
 
-    <section class="section section-tight">
+    <section class="contact-body">
       <ul class="channels">
         {
           channels.map((c) => (
@@ -25,10 +26,10 @@ const channels = [
               <a href={c.href} rel="me noopener" target={c.href.startsWith('mailto') ? undefined : '_blank'}>
                 <span class="glyph mono" aria-hidden="true">{c.glyph}</span>
                 <span class="meta">
-                  <span class="label">{c.label}</span>
+                  <span class="ch-label">{c.label}</span>
                   <span class="val mono">{c.value}</span>
                 </span>
-                <span class="arrow" aria-hidden="true">→</span>
+                <span class="arrow" aria-hidden="true">&rarr;</span>
               </a>
             </li>
           ))
@@ -45,7 +46,7 @@ const channels = [
                 <dt>Fingerprint</dt>
                 <dd>{site.pgp.fingerprint}</dd>
               </dl>
-              <a class="btn btn-sm" href={site.pgp.keyUrl} download>Download public key</a>
+              <a class="cv-btn" href={site.pgp.keyUrl} download>Download public key</a>
             </>
           ) : (
             <p class="muted">
@@ -60,10 +61,30 @@ const channels = [
 </BaseLayout>
 
 <style>
+  .inner-page {
+    padding-bottom: 4rem;
+  }
+  .page-header {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 0 0 0.5rem;
+  }
+  .page-header p {
+    color: var(--muted);
+    font-size: 1rem;
+    margin: 0;
+  }
+
   .channels {
     list-style: none;
     padding: 0;
-    margin: 0 0 3rem;
+    margin: 0 0 2.5rem;
     display: grid;
     gap: 0.75rem;
   }
@@ -73,48 +94,77 @@ const channels = [
     gap: 1rem;
     padding: 1rem 1.25rem;
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: 12px;
     background: var(--bg-elev);
     text-decoration: none;
-    transition: border-color 0.15s, transform 0.15s;
+    transition: border-color 0.2s, transform 0.2s;
   }
   .channels a:hover {
-    border-color: var(--accent);
-    transform: translateX(3px);
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+    transform: translateX(4px);
   }
   .glyph {
     flex: none;
     display: grid;
     place-items: center;
-    width: 2.75rem;
-    height: 2.75rem;
-    border-radius: 10px;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 8px;
     background: var(--accent-soft);
     color: var(--accent);
     font-weight: 700;
+    font-size: 0.85rem;
   }
   .meta {
     display: grid;
     gap: 0.1rem;
     min-width: 0;
   }
+  .ch-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
   .val {
+    font-size: 0.9rem;
     overflow-wrap: anywhere;
   }
   .arrow {
     margin-left: auto;
     color: var(--muted);
+    font-size: 0.9rem;
   }
+
   .pgp {
     padding: 1.5rem;
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: 12px;
     background: var(--bg-soft);
   }
   .pgp h2 {
+    font-size: 1.15rem;
     margin-top: 0;
   }
-  .pgp .btn {
+  .cv-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     margin-top: 1rem;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--bg-elev);
+    color: var(--fg);
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: border-color 0.2s;
+  }
+  .cv-btn:hover {
+    border-color: var(--accent);
+    color: var(--fg);
   }
 </style>

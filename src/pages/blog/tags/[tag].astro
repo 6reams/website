@@ -1,6 +1,7 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
 import PostItem from '../../../components/PostItem.astro';
 import { getPosts, allTags, slugify } from '@/lib/content';
 
@@ -16,14 +17,37 @@ const { tag, posts } = Astro.props;
 ---
 
 <BaseLayout title={`#${tag}`} description={`Posts tagged "${tag}".`}>
-  <div class="container prose-width">
-    <header class="page-head">
-      <p class="eyebrow">Tag</p>
+  <div class="container inner-page">
+    <Breadcrumb backHref="/blog/" backLabel="Back" />
+    <header class="page-header">
       <h1>#{tag}</h1>
-      <p>{posts.length} post{posts.length === 1 ? '' : 's'} tagged <span class="mono">{tag}</span>. <a href="/blog/">All posts →</a></p>
+      <p>{posts.length} post{posts.length === 1 ? '' : 's'} tagged <span class="mono">{tag}</span>. <a href="/blog/">All posts &rarr;</a></p>
     </header>
-    <section class="section section-tight">
+    <section class="post-list">
       {posts.map((post) => <PostItem post={post} headingLevel="h2" />)}
     </section>
   </div>
 </BaseLayout>
+
+<style>
+  .inner-page {
+    max-width: 52rem;
+    padding-bottom: 4rem;
+  }
+  .page-header {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 0 0 0.5rem;
+  }
+  .page-header p {
+    color: var(--muted);
+    font-size: 1rem;
+    margin: 0;
+  }
+</style>

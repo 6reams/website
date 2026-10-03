@@ -2,6 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
 import TagList from '../../components/TagList.astro';
 import { getProjects, formatDate } from '@/lib/content';
 
@@ -16,24 +17,26 @@ const { title, description, tags, link, repo, date } = project.data;
 ---
 
 <BaseLayout title={title} description={description} type="article" tags={tags} publishedTime={date}>
-  <div class="container">
-    <article class="prose-width">
-      <header class="page-head">
-        <a class="link-back" href="/projects/">← Projects</a>
+  <div class="container inner-page">
+    <Breadcrumb backHref="/projects/" backLabel="Back" />
+    <article>
+      <header class="proj-head">
         <h1>{title}</h1>
-        <p>{description}</p>
         <div class="proj-meta">
-          <TagList tags={tags} label="Tech" />
-          <span class="label">{formatDate(date)}</span>
+          <time class="proj-date" datetime={date.toISOString()}>{formatDate(date)}</time>
+          {link && (
+            <a class="visit-link" href={link} rel="noopener" target="_blank">
+              Visit <svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3.5 3.5h5v5M8.5 3.5L3 9"/></svg>
+            </a>
+          )}
         </div>
-        {
-          (link || repo) && (
-            <div class="btn-row mt-3">
-              {link && <a class="btn btn-primary btn-sm" href={link} rel="noopener" target="_blank">Live / demo ↗</a>}
-              {repo && <a class="btn btn-sm" href={repo} rel="noopener" target="_blank">Source ↗</a>}
-            </div>
-          )
-        }
+        <TagList tags={tags} label="Tech" />
+        {repo && (
+          <a class="repo-link" href={repo} rel="noopener" target="_blank">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            Source
+          </a>
+        )}
       </header>
       <div class="prose">
         <Content />
@@ -43,19 +46,63 @@ const { title, description, tags, link, repo, date } = project.data;
 </BaseLayout>
 
 <style>
-  .link-back {
-    display: inline-block;
-    margin-bottom: 1rem;
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    color: var(--muted);
-    text-decoration: none;
+  .inner-page {
+    max-width: 52rem;
+    padding-bottom: 4rem;
+  }
+  .proj-head {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+  .proj-head h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 0 0 0.75rem;
   }
   .proj-meta {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem 1.25rem;
     align-items: center;
-    margin-top: 1rem;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .proj-date {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  .visit-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-display);
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .visit-link:hover {
+    color: var(--accent);
+  }
+  .repo-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .repo-link:hover {
+    color: var(--fg);
+  }
+  .prose {
+    max-width: var(--max-prose);
   }
 </style>

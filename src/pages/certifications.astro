@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
 import CertCard from '../components/CertCard.astro';
 import { getCerts } from '@/lib/content';
 import { site } from '@config';
@@ -11,39 +12,53 @@ const certs = await getCerts();
   title="Certifications"
   description={`${certs.length} offensive-security and application-security certifications held by ${site.name}.`}
 >
-  <div class="container">
-    <header class="page-head">
-      <div class="pill cert-count-pill">
-        <span class="pill-dot" aria-hidden="true"></span>
-        {certs.length} certifications
-      </div>
-      <h1>Credentials</h1>
-      <p>Industry certifications across offensive security, red teaming and application security. Click any badge to verify the credential.</p>
+  <div class="container inner-page">
+    <Breadcrumb />
+    <header class="page-header">
+      <h1>Certifications</h1>
+      <p>Verified credentials and professional specializations.</p>
     </header>
-  </div>
 
-  <section class="section section-tight">
-    <div class="container">
-      <div class="badge-grid">
-        {certs.map((cert) => <CertCard cert={cert} />)}
-      </div>
-    </div>
-  </section>
+    <section class="cert-grid">
+      {certs.map((cert) => <CertCard cert={cert} />)}
+    </section>
+  </div>
 </BaseLayout>
 
 <style>
-  .cert-count-pill {
-    margin-bottom: 1.25rem;
+  .inner-page {
+    max-width: 64rem;
+    padding-bottom: 4rem;
   }
-  .badge-grid {
+  .page-header {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 0 0 0.5rem;
+  }
+  .page-header p {
+    color: var(--muted);
+    font-size: 1rem;
+    margin: 0;
+  }
+  .cert-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
   }
-  @media (min-width: 48rem) {
-    .badge-grid {
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
-      gap: 1.25rem;
+  @media (max-width: 48rem) {
+    .cert-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 30rem) {
+    .cert-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>

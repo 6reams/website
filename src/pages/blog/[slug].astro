@@ -2,6 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
 import TagList from '../../components/TagList.astro';
 import { getPosts, formatDate, readingTime } from '@/lib/content';
 
@@ -16,51 +17,76 @@ const { title, description, tags, date, updated } = post.data;
 ---
 
 <BaseLayout title={title} description={description} type="article" tags={tags} publishedTime={date} modifiedTime={updated}>
-  <div class="container">
-    <article class="prose-width">
-      <header class="page-head">
-        <a class="link-back" href="/blog/">← Blog</a>
+  <div class="container inner-page">
+    <Breadcrumb backHref="/blog/" backLabel="Back" />
+    <article>
+      <header class="post-head">
         <h1>{title}</h1>
-        <div class="post-meta label">
+        <div class="post-meta">
           <time datetime={date.toISOString()}>{formatDate(date)}</time>
-          <span aria-hidden="true">·</span>
+          <span class="sep" aria-hidden="true">&middot;</span>
           <span>{readingTime(post.body)}</span>
-          {updated && <><span aria-hidden="true">·</span><span>updated {formatDate(updated)}</span></>}
+          {updated && <><span class="sep" aria-hidden="true">&middot;</span><span>updated {formatDate(updated)}</span></>}
         </div>
+        <TagList tags={tags} linked />
       </header>
       <div class="prose">
         <Content />
       </div>
       <footer class="post-foot">
-        <TagList tags={tags} linked />
-        <a class="link-arrow" href="/blog/">More posts</a>
+        <a class="back-link" href="/blog/">&larr; All posts</a>
       </footer>
     </article>
   </div>
 </BaseLayout>
 
 <style>
-  .link-back {
-    display: inline-block;
-    margin-bottom: 1rem;
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    color: var(--muted);
-    text-decoration: none;
+  .inner-page {
+    max-width: 52rem;
+    padding-bottom: 4rem;
+  }
+  .post-head {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+  .post-head h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 0 0 0.75rem;
   }
   .post-meta {
     display: flex;
-    gap: 0.5rem;
     flex-wrap: wrap;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+    margin-bottom: 1rem;
+  }
+  .sep {
+    opacity: 0.4;
+  }
+  .prose {
+    max-width: var(--max-prose);
   }
   .post-foot {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: center;
-    justify-content: space-between;
     margin-top: 3rem;
     padding-top: 1.5rem;
     border-top: 1px solid var(--border);
+  }
+  .back-link {
+    font-family: var(--font-display);
+    font-size: 0.88rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .back-link:hover {
+    color: var(--accent);
   }
 </style>
