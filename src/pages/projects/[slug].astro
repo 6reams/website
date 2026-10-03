@@ -13,7 +13,7 @@ export const getStaticPaths = (async () => {
 
 const { project } = Astro.props;
 const { Content } = await render(project);
-const { title, description, tags, link, repo, date } = project.data;
+const { title, description, tags, link, repo, date, image, private: isPrivate } = project.data;
 ---
 
 <BaseLayout title={title} description={description} type="article" tags={tags} publishedTime={date}>
@@ -31,19 +31,43 @@ const { title, description, tags, link, repo, date } = project.data;
           )}
         </div>
         <TagList tags={tags} label="Tech" />
-        {repo && (
+        {repo && !isPrivate && (
           <a class="repo-link" href={repo} rel="noopener" target="_blank">
             <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
             Source
           </a>
         )}
+        {repo && isPrivate && (
+          <button class="repo-link private-source" type="button">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            Source
+            <span class="private-toast">
+              <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M8 1a4 4 0 00-4 4v2H3a1 1 0 00-1 1v6a1 1 0 001 1h10a1 1 0 001-1V8a1 1 0 00-1-1h-1V5a4 4 0 00-4-4zm-2 4a2 2 0 114 0v2H6V5z"/></svg>
+              Not public yet
+            </span>
+          </button>
+        )}
       </header>
+      {image && (
+        <div class="proj-banner">
+          <img src={image} alt={title} loading="eager" />
+        </div>
+      )}
       <div class="prose">
         <Content />
       </div>
     </article>
   </div>
 </BaseLayout>
+
+<script is:inline>
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('.private-source');
+  if (!btn) return;
+  btn.classList.add('show-toast');
+  setTimeout(function() { btn.classList.remove('show-toast'); }, 2000);
+});
+</script>
 
 <style>
   .inner-page {
@@ -55,6 +79,18 @@ const { title, description, tags, link, repo, date } = project.data;
     padding-bottom: 2rem;
     border-bottom: 1px solid var(--border);
     margin-bottom: 2rem;
+  }
+  .proj-banner {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    margin-bottom: 2.5rem;
+  }
+  .proj-banner img {
+    display: block;
+    width: 100%;
+    height: auto;
   }
   .proj-head h1 {
     font-family: var(--font-display);
@@ -101,6 +137,51 @@ const { title, description, tags, link, repo, date } = project.data;
   }
   .repo-link:hover {
     color: var(--fg);
+  }
+  .private-source {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    padding: 0;
+    font: inherit;
+  }
+  .private-toast {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 0.6rem);
+    transform: translateX(-50%) translateY(6px);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 8px;
+    background: var(--bg-elev-2);
+    border: 1px solid var(--border-strong);
+    color: var(--fg);
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.5);
+  }
+  .private-toast::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--bg-elev-2);
+  }
+  .private-source:hover .private-toast,
+  .private-source:focus-visible .private-toast,
+  .private-source.show-toast .private-toast {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
   .prose {
     max-width: var(--max-prose);

@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import { site } from './site.config.ts';
 import cspHashes from './src/integrations/csp-hashes.mjs';
 import { styleToClass, writeShikiCss } from './src/integrations/shiki-classes.mjs';
@@ -27,6 +28,13 @@ export default defineConfig({
       transformers: [styleToClass()],
       wrap: false,
     },
+    rehypePlugins: [
+      [rehypeSanitize, {
+        ...defaultSchema,
+        tagNames: [...(defaultSchema.tagNames ?? []), 'mark', 'details', 'summary'],
+        attributes: { ...defaultSchema.attributes, code: [['className']] },
+      }],
+    ],
   },
   vite: {
     build: {
