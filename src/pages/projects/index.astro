@@ -12,12 +12,12 @@ const fmtDate = (d: Date) =>
 <BaseLayout title="Projects" description="Security projects and tools — each written up as problem, approach and result.">
   <div class="container inner-page">
     <Breadcrumb />
-    <header class="page-header">
+    <header class="page-header page-reveal">
       <h1>All Projects</h1>
       <p>Showcase of applications, systems, and digital experiments.</p>
     </header>
 
-    <section class="project-list">
+    <section class="project-list page-reveal page-reveal-d1">
       {projects.map((project) => (
         <a class="project-row" href={`/projects/${project.id}/`}>
           <div class="project-thumb" aria-hidden="true">

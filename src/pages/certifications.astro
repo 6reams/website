@@ -14,12 +14,12 @@ const certs = await getCerts();
 >
   <div class="container inner-page">
     <Breadcrumb />
-    <header class="page-header">
+    <header class="page-header page-reveal">
       <h1>Certifications</h1>
       <p>Verified credentials and professional specializations.</p>
     </header>
 
-    <section class="cert-grid">
+    <section class="cert-grid page-reveal page-reveal-d1">
       {certs.map((cert) => <CertCard cert={cert} />)}
     </section>
   </div>

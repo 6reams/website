@@ -19,11 +19,11 @@ const { tag, posts } = Astro.props;
 <BaseLayout title={`#${tag}`} description={`Posts tagged "${tag}".`}>
   <div class="container inner-page">
     <Breadcrumb backHref="/blog/" backLabel="Back" />
-    <header class="page-header">
+    <header class="page-header page-reveal">
       <h1>#{tag}</h1>
       <p>{posts.length} post{posts.length === 1 ? '' : 's'} tagged <span class="mono">{tag}</span>. <a href="/blog/">All posts &rarr;</a></p>
     </header>
-    <section class="post-list">
+    <section class="post-list page-reveal page-reveal-d1">
       {posts.map((post) => <PostItem post={post} headingLevel="h2" />)}
     </section>
   </div>
