@@ -12,7 +12,9 @@ const { title, description, tags, date } = project.data;
 ---
 
 <article class="card proj-card" data-animate>
-  <div class="proj-year">{date.getUTCFullYear()}</div>
+  <div class="proj-header">
+    <span class="proj-year">{date.getUTCFullYear()}</span>
+  </div>
   <H><a class="stretched" href={`/projects/${project.id}/`}>{title}</a></H>
   <p>{description}</p>
   <div class="card-foot">
@@ -23,8 +25,23 @@ const { title, description, tags, date } = project.data;
 
 <style>
   .proj-card {
-    /* accent line slides in from bottom on hover */
+    counter-increment: card;
     overflow: hidden;
+  }
+  .proj-card::before {
+    content: '0' counter(card);
+    position: absolute;
+    top: 0.75rem;
+    right: 1.25rem;
+    font: 800 3.5rem/1 var(--font-display);
+    letter-spacing: -0.04em;
+    color: var(--accent);
+    opacity: 0.06;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .proj-card:hover::before {
+    opacity: 0.12;
   }
   .proj-card::after {
     content: '';
@@ -33,15 +50,21 @@ const { title, description, tags, date } = project.data;
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 30%, transparent));
+    background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 20%, transparent));
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .proj-card:hover::after {
     transform: scaleX(1);
   }
+  .proj-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
   .proj-year {
+    font-family: var(--font-mono);
     font-size: 0.72rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;

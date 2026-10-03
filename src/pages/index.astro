@@ -12,16 +12,19 @@ const posts = (await getPosts()).slice(0, 3);
 ---
 
 <BaseLayout>
-  <section class="hero section">
-    <div class="hero-orb" aria-hidden="true"></div>
+  <section class="hero">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-glow" aria-hidden="true"></div>
     <div class="container">
-      <div class="hero-text">
-        <div class="pill hero-pill">
-          <span class="pill-dot" aria-hidden="true"></span>
-          {site.location}
+      <div class="hero-inner">
+        <div>
+          <div class="pill hero-pill">
+            <span class="pill-dot" aria-hidden="true"></span>
+            {site.location}
+          </div>
         </div>
         <h1 class="gradient-text">{site.intro}</h1>
-        <p class="lede">{site.bio}</p>
+        <p class="hero-bio">{site.bio}</p>
         <div class="btn-row">
           <a class="btn btn-primary" href="/projects/">View projects</a>
           <a class="btn" href="/contact/">Get in touch</a>
@@ -36,7 +39,7 @@ const posts = (await getPosts()).slice(0, 3);
           stats.map((s) => (
             <li>
               <span class="stat-val">{s.value}</span>
-              <span class="label">{s.label}</span>
+              <span class="stat-label">{s.label}</span>
             </li>
           ))
         }
@@ -81,7 +84,7 @@ const posts = (await getPosts()).slice(0, 3);
                 <span class="glyph mono" aria-hidden="true">{t.icon}</span>
                 <span>
                   <strong>{t.name}</strong>
-                  <span class="label">{t.tagline}</span>
+                  <span class="tool-desc">{t.tagline}</span>
                 </span>
               </a>
             </li>
@@ -93,60 +96,93 @@ const posts = (await getPosts()).slice(0, 3);
 </BaseLayout>
 
 <style>
+  /* ---------- hero ---------- */
   .hero {
     position: relative;
     overflow: hidden;
-    padding-top: clamp(3rem, 8vw, 5.5rem);
+    padding-top: clamp(4rem, 10vw, 7rem);
+    padding-bottom: clamp(2rem, 4vw, 3rem);
   }
-  /* floating ambient orb — pure CSS, no JS */
-  .hero-orb {
+
+  .hero-bg {
     position: absolute;
-    top: -8rem;
-    right: -12rem;
-    width: clamp(22rem, 55vw, 48rem);
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: radial-gradient(ellipse 70% 55% at 50% 0%, black 10%, transparent);
+    -webkit-mask-image: radial-gradient(ellipse 70% 55% at 50% 0%, black 10%, transparent);
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: -16rem;
+    right: -8rem;
+    width: clamp(24rem, 55vw, 50rem);
     aspect-ratio: 1;
     border-radius: 50%;
     background: radial-gradient(
       circle at 40% 40%,
-      color-mix(in srgb, var(--accent) 18%, transparent),
-      transparent 65%
+      color-mix(in srgb, var(--accent) 14%, transparent),
+      transparent 60%
     );
-    animation: float 12s ease-in-out infinite alternate;
+    animation: float 14s ease-in-out infinite alternate;
     pointer-events: none;
   }
-  .hero-text {
+
+  .hero-inner {
     position: relative;
-    max-width: 44rem;
+    max-width: 42rem;
   }
   .hero-pill {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.75rem;
   }
   .hero h1 {
-    max-width: 22ch;
-    margin-bottom: 1rem;
+    max-width: 20ch;
+    margin-bottom: 1.25rem;
   }
-  .lede {
+  .hero-bio {
     color: var(--muted);
-    font-size: 1.15rem;
-    max-width: 38rem;
-    margin-bottom: 1.75rem;
-    line-height: 1.7;
+    font-size: 1.1rem;
+    max-width: 36rem;
+    margin-bottom: 2rem;
+    line-height: 1.75;
   }
+
+  /* staggered entrance */
+  .hero-inner > * {
+    animation: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .hero-inner > :nth-child(1) { animation-delay: 0ms; }
+  .hero-inner > :nth-child(2) { animation-delay: 100ms; }
+  .hero-inner > :nth-child(3) { animation-delay: 200ms; }
+  .hero-inner > :nth-child(4) { animation-delay: 300ms; }
   .stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
+    animation: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: 400ms;
+  }
+
+  /* ---------- stats ---------- */
+  .stats {
+    display: flex;
+    gap: 0;
     list-style: none;
-    padding: 1.75rem 0 0;
+    padding: 2rem 0 0;
     margin: 3.5rem 0 0;
     border-top: 1px solid var(--border);
   }
   .stats li {
-    display: grid;
-    gap: 0.3rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding-right: 1rem;
+  }
+  .stats li + li {
+    padding-left: 1.5rem;
+    border-left: 1px solid var(--border);
   }
   .stat-val {
-    font: 700 clamp(1.6rem, 5vw, 2.5rem) / 1 var(--font-sans);
+    font: 700 clamp(1.5rem, 4.5vw, 2.25rem) / 1 var(--font-display);
     color: var(--fg);
     letter-spacing: -0.03em;
     background: linear-gradient(135deg, var(--fg), var(--accent));
@@ -154,6 +190,14 @@ const posts = (await getPosts()).slice(0, 3);
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+  .stat-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ---------- tools ---------- */
   .tools-note {
     margin-top: -0.75rem;
     margin-bottom: 1.5rem;
@@ -171,24 +215,33 @@ const posts = (await getPosts()).slice(0, 3);
     display: flex;
     align-items: center;
     gap: 0.9rem;
-    padding: 1rem 1.1rem;
+    padding: 1rem 1.15rem;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     background: var(--bg-elev);
     text-decoration: none;
-    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
   }
   .tool-links a:hover {
-    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 50%, transparent);
     transform: translateY(-3px);
-    box-shadow: 0 12px 32px -8px color-mix(in srgb, var(--accent) 16%, rgba(0,0,0,0.3));
+    box-shadow:
+      0 12px 32px -8px rgba(0, 0, 0, 0.3),
+      0 0 0 1px color-mix(in srgb, var(--accent) 10%, transparent);
   }
   .tool-links strong {
     display: block;
     font-weight: 600;
+    font-family: var(--font-display);
   }
   .tool-links span span {
     display: block;
+  }
+  .tool-desc {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
   }
   .glyph {
     flex: none;
@@ -196,10 +249,23 @@ const posts = (await getPosts()).slice(0, 3);
     place-items: center;
     width: 2.5rem;
     height: 2.5rem;
-    border-radius: 9px;
+    border-radius: 10px;
     background: var(--accent-soft);
     color: var(--accent);
     font-size: 0.9rem;
     font-weight: 700;
+  }
+
+  @media (max-width: 32rem) {
+    .stats {
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .stats li + li {
+      padding-left: 0;
+      padding-top: 1.25rem;
+      border-left: none;
+      border-top: 1px solid var(--border);
+    }
   }
 </style>
