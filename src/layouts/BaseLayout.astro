@@ -22,7 +22,7 @@ const accentCss = `:root{--accent:${site.accent}}`;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     {metaCsp && import.meta.env.PROD && <meta http-equiv="Content-Security-Policy" content={metaCsp} />}
     <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#0c1018" />
+    <meta name="theme-color" content="#000000" />
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
@@ -34,6 +34,5 @@ const accentCss = `:root{--accent:${site.accent}}`;
     <main id="main" tabindex="-1">
       <slot />
     </main>
-    <script is:inline src="/js/ascii-bg.js"></script>
   </body>
 </html>
