@@ -1,15 +1,13 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
-// This page talks to Firebase, so it ships its own CSP (the global strict CSP is removed for
-// /admin in public/_headers). Still no 'unsafe-inline' for scripts — only hashed inline + bundled.
 const metaCsp = [
   "default-src 'self'",
   "script-src 'self' __INLINE_SCRIPT_HASHES__",
   "style-src 'self' __INLINE_STYLE_HASHES__",
   "img-src 'self' data: blob:",
   "font-src 'self'",
-  "connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebaseinstallations.googleapis.com https://api.cloudflare.com",
+  "connect-src 'self' https://*.supabase.co https://api.cloudflare.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -21,12 +19,12 @@ const metaCsp = [
     <header class="page-head">
       <p class="eyebrow">Private</p>
       <h1>Content admin</h1>
-      <p>Sign in to add a blog post or a certification. Entries are saved to Firestore; the live site picks them up on the next build.</p>
+      <p>Sign in to add a blog post or a certification. Entries are saved to Supabase; the live site picks them up on the next build.</p>
     </header>
 
     <div id="admin-unconfigured" class="callout" hidden>
-      <strong>Firebase isn't configured.</strong> Set <code>PUBLIC_FIREBASE_*</code> in your environment
-      (see <code>.env.example</code> and the README) and redeploy to use this page.
+      <strong>Supabase isn't configured.</strong> Set <code>PUBLIC_SUPABASE_URL</code> and <code>PUBLIC_SUPABASE_ANON_KEY</code> in your environment
+      (see <code>.env.example</code>) and redeploy to use this page.
     </div>
 
     <!-- Sign in -->
@@ -145,47 +143,47 @@ const metaCsp = [
 </BaseLayout>
 
 <script>
-  import { isConfigured, firebase, DEPLOY_HOOK } from '@/lib/firebase-client';
-  import {
-    signInWithEmailAndPassword,
-    onAuthStateChanged,
-    signOut,
-    type User,
-  } from 'firebase/auth';
-  import { collection, addDoc, Timestamp } from 'firebase/firestore';
+  import { isConfigured, supabase } from '@/lib/supabase';
 
   const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const show = (el: HTMLElement | null, visible: boolean) => el && (el.hidden = !visible);
 
+  const DEPLOY_HOOK: string = import.meta.env.PUBLIC_DEPLOY_HOOK ?? '';
+
   if (!isConfigured()) {
     show($('admin-unconfigured'), true);
   } else {
-    const { auth, db } = firebase();
+    const sb = supabase();
 
     // ---- auth state ----
-    onAuthStateChanged(auth, (user: User | null) => {
+    sb.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user ?? null;
       show($('admin-login'), !user);
       show($('admin-app'), !!user);
       if (user) $('who-email').textContent = user.email ?? '';
     });
 
+    // check initial session
+    const { data: { session: initial } } = await sb.auth.getSession();
+    if (!initial) {
+      show($('admin-login'), true);
+    }
+
     $('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const err = $('login-error');
       show(err, false);
-      try {
-        await signInWithEmailAndPassword(
-          auth,
-          ($('login-email') as HTMLInputElement).value,
-          ($('login-password') as HTMLInputElement).value,
-        );
-      } catch (ex) {
+      const { error } = await sb.auth.signInWithPassword({
+        email: ($('login-email') as HTMLInputElement).value,
+        password: ($('login-password') as HTMLInputElement).value,
+      });
+      if (error) {
         show(err, true);
-        err.textContent = (ex as Error).message.replace('Firebase: ', '');
+        err.textContent = error.message;
       }
     });
 
-    $('signout').addEventListener('click', () => signOut(auth));
+    $('signout').addEventListener('click', () => sb.auth.signOut());
 
     // ---- tabs ----
     document.querySelectorAll<HTMLButtonElement>('.tab').forEach((tab) =>
@@ -208,15 +206,15 @@ const metaCsp = [
       const form = e.currentTarget as HTMLFormElement;
       try {
         const tags = ($('p-tags') as HTMLInputElement).value.split(',').map((t) => t.trim()).filter(Boolean);
-        await addDoc(collection(db, 'posts'), {
+        const { error } = await sb.from('posts').insert({
           title: ($('p-title') as HTMLInputElement).value,
           description: ($('p-desc') as HTMLInputElement).value,
-          date: Timestamp.fromDate(new Date(($('p-date') as HTMLInputElement).value)),
+          date: ($('p-date') as HTMLInputElement).value,
           tags,
           draft: ($('p-draft') as HTMLInputElement).checked,
           body: ($('p-body') as HTMLTextAreaElement).value,
-          createdAt: Timestamp.now(),
         });
+        if (error) throw error;
         form.reset();
         setStatus(form, 'Saved. It will appear after the next build.', true);
       } catch (ex) {
@@ -251,17 +249,17 @@ const metaCsp = [
       const form = e.currentTarget as HTMLFormElement;
       try {
         const dateVal = ($('c-date') as HTMLInputElement).value;
-        await addDoc(collection(db, 'certifications'), {
+        const { error } = await sb.from('certifications').insert({
           name: ($('c-name') as HTMLInputElement).value,
           abbr: ($('c-abbr') as HTMLInputElement).value,
           issuer: ($('c-issuer') as HTMLInputElement).value,
-          date: dateVal ? Timestamp.fromDate(new Date(dateVal)) : null,
-          credentialUrl: ($('c-url') as HTMLInputElement).value,
-          description: ($('c-desc') as HTMLTextAreaElement).value,
+          date: dateVal || null,
+          credential_url: ($('c-url') as HTMLInputElement).value || null,
+          description: ($('c-desc') as HTMLTextAreaElement).value || null,
           order: Number(($('c-order') as HTMLInputElement).value) || 100,
-          badgeData: badgeData || null,
-          createdAt: Timestamp.now(),
+          badge_data: badgeData || null,
         });
+        if (error) throw error;
         form.reset();
         ($('c-preview') as HTMLImageElement).hidden = true;
         badgeData = '';

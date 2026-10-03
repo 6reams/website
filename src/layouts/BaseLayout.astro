@@ -7,7 +7,7 @@ import '../styles/shiki.generated.css';
 import { site } from '@config';
 import Seo, { type Props as SeoProps } from '../components/Seo.astro';
 export interface Props extends SeoProps {
-  /** Optional page-specific <meta> CSP (used by /admin, which talks to Firebase). Production only. */
+  /** Optional page-specific <meta> CSP (used by /admin, which talks to Supabase). Production only. */
   metaCsp?: string;
 }
 
