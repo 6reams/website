@@ -2,7 +2,8 @@
 title: 'Spylo 1.0 — Modular OSINT Framework'
 description: 'An extensible Python framework that unifies 20+ reconnaissance modules behind one interface, with multithreaded collection and data correlation.'
 tags: ['Python', 'OSINT', 'Recon', 'Automation']
-repo: 'https://github.com/kerbrute'
+repo: 'https://github.com/6reams/Spylo'
+image: '/images/projects/spylo.webp'
 date: 2026-06-01
 featured: true
 order: 1

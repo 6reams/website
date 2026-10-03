@@ -30,7 +30,7 @@ export const site = {
   /** Contact + social links. Leave a value empty ('') to hide it everywhere. */
   email: 'ahmadbilaidi2@gmail.com',
   socials: {
-    github: 'https://github.com/kerbrute',
+    github: 'https://github.com/6reams',
     linkedin: 'https://www.linkedin.com/in/ahmadbilaidi/',
   },
 

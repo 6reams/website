@@ -31,6 +31,7 @@ const projects = defineCollection({
     tags: z.array(z.string()).default([]),
     link: z.url().optional(),
     repo: z.url().optional(),
+    image: z.string().optional(),
     date: z.coerce.date(),
     featured: z.boolean().default(false),
     /** Lower comes first among featured projects. */
