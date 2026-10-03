@@ -1,20 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-
-const metaCsp = [
-  "default-src 'self'",
-  "script-src 'self' __INLINE_SCRIPT_HASHES__",
-  "style-src 'self' __INLINE_STYLE_HASHES__",
-  "img-src 'self' data: blob:",
-  "font-src 'self'",
-  "connect-src 'self' https://*.supabase.co https://api.cloudflare.com",
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-].join('; ');
 ---
 
-<BaseLayout title="Admin" description="Private content editor." noindex metaCsp={metaCsp}>
+<BaseLayout title="Admin" description="Private content editor." noindex>
   <div class="container prose-width">
     <header class="page-head">
       <p class="eyebrow">Private</p>
@@ -169,17 +157,34 @@ const metaCsp = [
       show($('admin-login'), true);
     }
 
+    let loginAttempts = 0;
+    let lockoutUntil = 0;
+
     $('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const err = $('login-error');
       show(err, false);
+
+      const now = Date.now();
+      if (now < lockoutUntil) {
+        show(err, true);
+        err.textContent = `Too many attempts. Try again in ${Math.ceil((lockoutUntil - now) / 1000)}s.`;
+        return;
+      }
+
       const { error } = await sb.auth.signInWithPassword({
         email: ($('login-email') as HTMLInputElement).value,
         password: ($('login-password') as HTMLInputElement).value,
       });
       if (error) {
+        loginAttempts++;
+        if (loginAttempts >= 5) {
+          lockoutUntil = now + loginAttempts * 5000;
+        }
         show(err, true);
-        err.textContent = error.message;
+        err.textContent = 'Invalid email or password.';
+      } else {
+        loginAttempts = 0;
       }
     });
 
