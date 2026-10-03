@@ -5,48 +5,50 @@ interface Props {
   cert: Cert;
 }
 const { cert } = Astro.props;
-const { name, abbr, issuer, credentialUrl } = cert.data;
+const { name, abbr, issuer, credentialUrl, date } = cert.data;
 const badge = badgeUrl(cert);
 const Tag = credentialUrl ? 'a' : 'div';
+const year = date?.getUTCFullYear();
 ---
 
-<article class="cert-badge" data-animate>
+<article class="cert-card">
   <Tag
     class="cert-inner"
     {...(credentialUrl
       ? { href: credentialUrl, rel: 'noopener', target: '_blank', 'aria-label': `Verify ${name} credential` }
       : {})}
   >
-    <div class="badge-img">
+    <div class="cert-visual">
       {badge
-        ? <img src={badge} alt={`${abbr} certification badge`} width="96" height="96" loading="lazy" decoding="async" />
-        : <span class="abbr-text">{abbr}</span>}
+        ? <img src={badge} alt={`${abbr} certification badge`} width="120" height="120" loading="lazy" decoding="async" />
+        : <div class="cert-placeholder">
+            <span class="cert-letter">{abbr}</span>
+            <span class="cert-issuer-mark">{issuer}</span>
+          </div>}
     </div>
-    <strong class="cert-abbr">{abbr}</strong>
-    <span class="cert-issuer">{issuer}</span>
-    {credentialUrl && <span class="verify-hint" aria-hidden="true">Verify ↗</span>}
+    <div class="cert-details">
+      <strong class="cert-name">{name}</strong>
+      <span class="cert-meta">{issuer}{year ? ` · ${year}` : ''}</span>
+    </div>
   </Tag>
 </article>
 
 <style>
-  .cert-badge {
-    border-radius: var(--radius);
+  .cert-card {
+    border-radius: 12px;
     border: 1px solid var(--border);
     background: var(--bg-elev);
-    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.2s, box-shadow 0.3s;
   }
-  .cert-badge:hover {
-    border-color: color-mix(in srgb, var(--accent) 50%, transparent);
-    transform: translateY(-4px);
-    box-shadow: 0 14px 36px -8px color-mix(in srgb, var(--accent) 20%, rgba(0,0,0,0.4));
+  .cert-card:hover {
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.4);
   }
   .cert-inner {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 0.6rem;
-    padding: 1.5rem 1rem 1.25rem;
     text-decoration: none;
     color: inherit;
     height: 100%;
@@ -56,55 +58,56 @@ const Tag = credentialUrl ? 'a' : 'div';
     outline-offset: 3px;
     border-radius: inherit;
   }
-  .badge-img {
-    width: 5.5rem;
-    height: 5.5rem;
+  .cert-visual {
+    aspect-ratio: 4 / 3;
     display: grid;
     place-items: center;
-    border-radius: 50%;
     background:
-      radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 65%),
+      radial-gradient(ellipse at 30% 30%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%),
       var(--bg-soft);
-    border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
+    border-bottom: 1px solid var(--border);
     overflow: hidden;
-    transition: box-shadow 0.2s;
   }
-  .cert-badge:hover .badge-img {
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
-  }
-  .badge-img img {
+  .cert-visual img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    padding: 0.4rem;
+    padding: 1.5rem;
   }
-  .abbr-text {
-    font: 700 0.85rem / 1 var(--font-mono);
+  .cert-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .cert-letter {
+    font: 800 2rem/1 var(--font-display);
     color: var(--accent);
     letter-spacing: 0.04em;
+    opacity: 0.8;
   }
-  .cert-abbr {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--fg);
-    letter-spacing: -0.01em;
-  }
-  .cert-issuer {
-    font-size: 0.75rem;
+  .cert-issuer-mark {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
     color: var(--muted);
-    letter-spacing: 0.02em;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
-  .verify-hint {
+  .cert-details {
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .cert-name {
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .cert-meta {
+    font-family: var(--font-mono);
     font-size: 0.72rem;
-    color: var(--accent);
-    letter-spacing: 0.05em;
-    opacity: 0;
-    transform: translateY(3px);
-    transition: opacity 0.2s, transform 0.2s;
-    margin-top: 0.25rem;
-  }
-  .cert-badge:hover .verify-hint {
-    opacity: 1;
-    transform: translateY(0);
+    color: var(--muted);
   }
 </style>

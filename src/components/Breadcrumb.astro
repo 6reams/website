@@ -1,0 +1,42 @@
+---
+interface Props {
+  backHref?: string;
+  backLabel?: string;
+}
+const { backHref, backLabel = 'Back' } = Astro.props;
+---
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  {backHref && <a href={backHref} class="crumb">&larr; {backLabel}</a>}
+  {backHref && <span class="sep" aria-hidden="true">/</span>}
+  <a href="/" class="crumb home">
+    <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+    Home
+  </a>
+</nav>
+
+<style>
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding-top: clamp(2rem, 4vw, 3rem);
+    font-family: var(--font-display);
+    font-size: 0.88rem;
+  }
+  .crumb {
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .crumb:hover {
+    color: var(--fg);
+  }
+  .sep {
+    color: var(--muted);
+    opacity: 0.4;
+  }
+</style>

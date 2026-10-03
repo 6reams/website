@@ -14,9 +14,9 @@ const path = Astro.url.pathname;
 
 <header class="site-header">
   <div class="container bar">
-    <a class="brand" href="/" aria-label={`${site.brand} — home`}>
+    <a class="brand" href="/" aria-label={`${site.name} — home`}>
       <span class="brand-mark" aria-hidden="true"></span>
-      <span>{site.brand}</span>
+      <span class="brand-name">{site.name}</span>
     </a>
     <nav aria-label="Main">
       <ul>
@@ -39,62 +39,64 @@ const path = Astro.url.pathname;
     position: sticky;
     top: 0;
     z-index: 50;
-    background: color-mix(in srgb, var(--bg) 85%, transparent);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
     border-bottom: 1px solid var(--border);
   }
   .bar {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-areas: 'brand' 'nav';
+    display: flex;
     align-items: center;
-    gap: 0.25rem 1rem;
-    padding-block: 0.75rem 0.25rem;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.75rem;
+    min-height: 3.25rem;
   }
   .brand {
-    grid-area: brand;
     display: inline-flex;
     align-items: center;
-    gap: 0.6rem;
-    font-weight: 700;
-    font-size: 1.05rem;
-    letter-spacing: 0.02em;
+    gap: 0.55rem;
     text-decoration: none;
-    justify-self: start;
+    flex-shrink: 0;
   }
   .brand-mark {
-    width: 0.65rem;
-    height: 0.65rem;
+    width: 0.5rem;
+    height: 0.5rem;
     border-radius: 50%;
     background: var(--accent);
     animation: pulse-glow 3s ease-in-out infinite;
   }
-  nav {
-    grid-area: nav;
-    overflow-x: auto;
-    scrollbar-width: none;
-    margin-inline: calc(var(--gutter) * -1);
-    padding-inline: var(--gutter);
+  .brand-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: -0.01em;
+    color: var(--fg);
   }
-  nav::-webkit-scrollbar {
-    display: none;
-  }
-  ul {
+  nav ul {
     display: flex;
-    gap: 0.25rem;
+    gap: 0.1rem;
     list-style: none;
     margin: 0;
     padding: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav ul::-webkit-scrollbar {
+    display: none;
   }
   nav a {
-    display: inline-block;
-    padding: 0.55rem 0.7rem;
-    border-radius: 8px;
-    font-size: 0.925rem;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    font-family: var(--font-display);
+    font-size: 0.82rem;
+    font-weight: 500;
     color: var(--muted);
     text-decoration: none;
     white-space: nowrap;
+    transition: color 0.2s, background 0.2s;
   }
   nav a:hover {
     color: var(--fg);
@@ -102,17 +104,6 @@ const path = Astro.url.pathname;
   }
   nav a[aria-current='page'] {
     color: var(--fg);
-  }
-  @media (min-width: 52rem) {
-    .bar {
-      grid-template-columns: auto 1fr;
-      grid-template-areas: 'brand nav';
-      padding-block: 0.85rem;
-    }
-    nav {
-      margin: 0;
-      padding: 0;
-      justify-self: end;
-    }
+    background: var(--bg-elev);
   }
 </style>

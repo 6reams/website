@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
 import { site } from '@config';
 import { timeline, skills, languages } from '@/data/profile';
 import { getCerts } from '@/lib/content';
@@ -9,24 +10,27 @@ const kindLabel = { work: 'Role', education: 'Education', award: 'Award' };
 ---
 
 <BaseLayout title="About" description={site.bio}>
-  <div class="container">
-    <header class="page-head prose-width">
-      <p class="eyebrow">About</p>
+  <div class="container inner-page">
+    <Breadcrumb />
+    <header class="page-header">
       <h1>{site.name}</h1>
-      <p>{site.bio}</p>
-      <div class="btn-row mt-3">
-        <a class="btn btn-primary" href={site.cv} download>Download CV</a>
-        <a class="btn" href="/contact/">Contact</a>
+      <p class="bio">{site.bio}</p>
+      <div class="header-actions">
+        <a class="cv-btn" href={site.cv} download>
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M10 3v10m0 0-3.5-3.5M10 13l3.5-3.5M3 17h14"/></svg>
+          Download CV
+        </a>
+        <a class="contact-link" href="/contact/">Contact &rarr;</a>
       </div>
     </header>
 
-    <section class="section section-loose">
+    <section class="about-section">
       <h2>Skills</h2>
       <div class="skills">
         {
           skills.map((group) => (
             <div class="skill-group">
-              <h3 class="label label-accent">{group.group}</h3>
+              <h3 class="skill-label">{group.group}</h3>
               <ul class="tags">
                 {group.items.map((item) => <li><span class="tag">{item}</span></li>)}
               </ul>
@@ -36,15 +40,15 @@ const kindLabel = { work: 'Role', education: 'Education', award: 'Award' };
       </div>
     </section>
 
-    <section class="section">
+    <section class="about-section">
       <h2>Timeline</h2>
       <ol class="timeline">
         {
           timeline.map((item) => (
             <li class:list={['tl-item', item.kind]}>
-              <div class="tl-when label">{item.period}</div>
+              <div class="tl-when">{item.period}</div>
               <div class="tl-body">
-                <div class="tl-tag label">{kindLabel[item.kind]}</div>
+                <div class="tl-tag">{kindLabel[item.kind]}</div>
                 <h3>{item.title}</h3>
                 <p class="tl-org">{item.org}</p>
                 {item.points && (
@@ -59,40 +63,119 @@ const kindLabel = { work: 'Role', education: 'Education', award: 'Award' };
       </ol>
     </section>
 
-    <section class="section">
-      <div class="two-col">
-        <div>
-          <h2>Certifications</h2>
-          <ul class="cert-list">
-            {certs.map((c) => (
-              <li>
-                <span class="mono cert-abbr">{c.data.abbr}</span>
-                <span>{c.data.name} <span class="muted">· {c.data.issuer}</span></span>
-              </li>
-            ))}
-          </ul>
-          <a class="link-arrow" href="/certifications/">All certifications</a>
-        </div>
-        <div>
-          <h2>Languages</h2>
-          <dl class="kv">
-            {languages.map((l) => <><dt>{l.name}</dt><dd>{l.level}</dd></>)}
-          </dl>
-        </div>
+    <section class="about-section two-col">
+      <div>
+        <h2>Certifications</h2>
+        <ul class="cert-list">
+          {certs.map((c) => (
+            <li>
+              <span class="cert-abbr">{c.data.abbr}</span>
+              <span>{c.data.name} <span class="muted">&middot; {c.data.issuer}</span></span>
+            </li>
+          ))}
+        </ul>
+        <a class="section-link" href="/certifications/">All certifications &rarr;</a>
+      </div>
+      <div>
+        <h2>Languages</h2>
+        <dl class="kv">
+          {languages.map((l) => <><dt>{l.name}</dt><dd>{l.level}</dd></>)}
+        </dl>
       </div>
     </section>
   </div>
 </BaseLayout>
 
 <style>
+  .inner-page {
+    max-width: 52rem;
+    padding-bottom: 4rem;
+  }
+  .page-header {
+    padding-top: 2rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 0 0 0.75rem;
+  }
+  .bio {
+    color: var(--muted);
+    font-size: 1.05rem;
+    margin: 0 0 1.5rem;
+    max-width: 40rem;
+    line-height: 1.7;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .cv-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--bg-elev);
+    color: var(--fg);
+    font-family: var(--font-display);
+    font-size: 0.88rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .cv-btn:hover {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, var(--bg-elev));
+    color: var(--fg);
+  }
+  .contact-link {
+    font-family: var(--font-display);
+    font-size: 0.88rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .contact-link:hover {
+    color: var(--accent);
+  }
+
+  .about-section {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .about-section:last-child {
+    border-bottom: none;
+  }
+  .about-section h2 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 1.25rem;
+  }
+
   .skills {
     display: grid;
     gap: 1.5rem;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
   }
-  .skill-group h3 {
+  .skill-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
     margin-bottom: 0.75rem;
+    font-weight: 600;
   }
+
   .timeline {
     list-style: none;
     padding: 0;
@@ -124,10 +207,18 @@ const kindLabel = { work: 'Role', education: 'Education', award: 'Award' };
     padding-bottom: 0;
   }
   .tl-when {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--muted);
     padding-top: 0.15rem;
   }
   .tl-tag {
-    font-size: 0.68rem;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
   }
   .tl-body h3 {
     margin: 0.2rem 0 0.1rem;
@@ -147,6 +238,7 @@ const kindLabel = { work: 'Role', education: 'Education', award: 'Award' };
   .tl-body li {
     margin: 0.3rem 0;
   }
+
   .two-col {
     display: grid;
     gap: 2.5rem;
@@ -166,10 +258,22 @@ const kindLabel = { work: 'Role', education: 'Education', award: 'Award' };
     font-size: 0.95rem;
   }
   .cert-abbr {
+    font-family: var(--font-mono);
     font-size: 0.8rem;
     color: var(--accent);
     font-weight: 700;
   }
+  .section-link {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .section-link:hover {
+    color: var(--accent);
+  }
+
   @media (min-width: 46rem) {
     .tl-item {
       grid-template-columns: 11rem 1fr;

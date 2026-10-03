@@ -1,17 +1,18 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
 import ToolNotice from '../../components/ToolNotice.astro';
 import { tools } from '@/tools/registry';
 ---
 
 <BaseLayout title="Tools" description="A small set of browser-based security utilities. Everything runs locally — nothing is sent to a server.">
-  <div class="container">
-    <header class="page-head">
-      <p class="eyebrow">Utilities</p>
-      <h1>Security tools</h1>
+  <div class="container inner-page">
+    <Breadcrumb />
+    <header class="page-header">
+      <h1>Security Tools</h1>
       <p>A small, growing set of utilities I reach for often. Pick one — they all run entirely in your browser.</p>
     </header>
-    <section class="section section-tight">
+    <section class="tools-section">
       <ToolNotice />
       <div class="grid">
         {
@@ -33,6 +34,26 @@ import { tools } from '@/tools/registry';
 </BaseLayout>
 
 <style>
+  .inner-page {
+    max-width: 64rem;
+    padding-bottom: 4rem;
+  }
+  .page-header {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 0 0 0.5rem;
+  }
+  .page-header p {
+    color: var(--muted);
+    font-size: 1rem;
+    margin: 0;
+  }
   .card h2 {
     font-size: 1.15rem;
   }

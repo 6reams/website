@@ -1,41 +1,33 @@
 /* ==========================================================================
-   00000 — design tokens + base styles. Plain CSS, no framework.
-   Dark-only. The five background/surface fills are the fixed brand palette:
-     #151d27  #141a24  #141b28  #111923  #0c1018
-   Text uses off-white/grey neutrals and borders use faint white so the dark
-   surfaces stay readable. The accent (one soft slate-blue) comes from
-   site.config.ts, injected as --accent.
+   Design tokens + base styles. Plain CSS, no framework. Dark-only.
    ========================================================================== */
 
 :root {
   --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Space Grotesk Variable', 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  --radius: 12px;
+  --radius: 14px;
   --radius-sm: 8px;
   --max: 72rem;
   --max-prose: 44rem;
-  --gutter: clamp(1rem, 4vw, 2rem);
-  --space: clamp(4rem, 10vw, 7rem);
+  --gutter: clamp(1.25rem, 4vw, 2rem);
+  --space: clamp(5rem, 12vw, 8rem);
 
-  /* brand palette — backgrounds and surfaces only */
-  --bg: #0c1018;        /* page background (darkest) */
-  --bg-soft: #111923;   /* inputs, code, subtle panels */
-  --bg-elev: #151d27;   /* cards, header (lightest of the five) */
-  --bg-elev-2: #141b28; /* nested surfaces */
+  --bg: #0b0f16;
+  --bg-soft: #111821;
+  --bg-elev: #161e29;
+  --bg-elev-2: #141b25;
 
-  /* neutrals for text + structure */
-  --fg: #e7ebf1;
-  --muted: #9aa6b4;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.16);
+  --fg: #e8ecf2;
+  --muted: #8a97a8;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.14);
 
-  /* one soft accent */
-  --accent-fg: #0c1018;
-  --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
+  --accent-fg: #0b0f16;
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, transparent);
   --glow: color-mix(in srgb, var(--accent) 16%, transparent);
 
-  /* functional status tones (password strength, token expiry) — kept muted */
   --ok: #86c2a1;
   --warn: #d8bd8a;
   --bad: #d99090;
@@ -53,6 +45,7 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-padding-top: 5rem;
+  scroll-behavior: smooth;
 }
 body {
   margin: 0;
@@ -63,7 +56,7 @@ body {
   color: var(--fg);
   font-family: var(--font-sans);
   font-size: 1.0625rem;
-  line-height: 1.65;
+  line-height: 1.7;
   font-feature-settings: 'cv11', 'ss01';
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -77,22 +70,26 @@ svg {
   max-width: 100%;
   height: auto;
 }
+
+/* ---------- typography ---------- */
 h1,
 h2,
 h3,
 h4 {
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
   margin: 0 0 0.5em;
-  font-weight: 650;
+  font-weight: 700;
   text-wrap: balance;
 }
 h1 {
-  font-size: clamp(2.1rem, 5vw, 3.25rem);
-  letter-spacing: -0.035em;
+  font-size: clamp(2.75rem, 7vw, 4.5rem);
+  letter-spacing: -0.045em;
+  line-height: 1.08;
 }
 h2 {
-  font-size: clamp(1.5rem, 3vw, 1.9rem);
+  font-size: clamp(1.65rem, 3.5vw, 2.25rem);
 }
 h3 {
   font-size: 1.15rem;
@@ -103,10 +100,10 @@ p {
 }
 a {
   color: inherit;
-  text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
-  text-underline-offset: 0.2em;
+  text-decoration-color: color-mix(in srgb, currentColor 30%, transparent);
+  text-underline-offset: 0.25em;
   text-decoration-thickness: 1px;
-  transition: color 0.15s, text-decoration-color 0.15s;
+  transition: color 0.2s, text-decoration-color 0.2s;
 }
 a:hover {
   color: var(--accent);
@@ -118,7 +115,7 @@ a:hover {
   border-radius: 4px;
 }
 ::selection {
-  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
 }
 hr {
   border: 0;
@@ -205,8 +202,9 @@ pre {
 }
 .eyebrow {
   display: inline-block;
-  font-size: 0.75rem;
-  letter-spacing: 0.1em;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted);
   margin-bottom: 1rem;
@@ -223,7 +221,7 @@ pre {
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 1.75rem;
+  margin-bottom: 2rem;
   flex-wrap: wrap;
 }
 .section-head h2 {
@@ -231,16 +229,21 @@ pre {
 }
 .link-arrow {
   font-size: 0.85rem;
+  font-family: var(--font-display);
   text-decoration: none;
   color: var(--muted);
   white-space: nowrap;
+  transition: color 0.2s;
 }
 .link-arrow::after {
-  content: ' →';
-  transition: margin 0.15s;
+  content: ' \2192';
+  transition: margin 0.2s;
+}
+.link-arrow:hover {
+  color: var(--accent);
 }
 .link-arrow:hover::after {
-  margin-left: 0.2em;
+  margin-left: 0.3em;
 }
 
 /* ---------- buttons ---------- */
@@ -253,30 +256,35 @@ pre {
   justify-content: center;
   gap: 0.5rem;
   min-height: 2.75rem;
-  padding: 0.6rem 1.15rem;
-  border-radius: 999px;
+  padding: 0.6rem 1.25rem;
+  border-radius: 10px;
   border: 1px solid var(--_bd);
   background: var(--_bg);
   color: var(--_fg);
-  font: 500 0.95rem/1 var(--font-sans);
+  font: 500 0.9rem/1 var(--font-display);
+  letter-spacing: 0.01em;
   text-decoration: none;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s, color 0.15s, transform 0.15s;
+  transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 .btn:hover {
   --_bd: var(--accent);
   color: var(--_fg);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.3);
 }
 .btn:active {
-  transform: translateY(1px);
+  transform: translateY(0);
 }
 .btn-primary {
   --_bg: var(--accent);
   --_fg: var(--accent-fg);
   --_bd: var(--accent);
+  font-weight: 600;
 }
 .btn-primary:hover {
-  --_bg: color-mix(in srgb, var(--accent) 88%, var(--fg));
+  --_bg: color-mix(in srgb, var(--accent) 85%, white);
+  box-shadow: 0 4px 24px -4px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 .btn-sm {
   min-height: 2.25rem;
@@ -296,24 +304,28 @@ pre {
 /* ---------- cards ---------- */
 .grid {
   display: grid;
-  gap: 1rem;
+  gap: 1.25rem;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  counter-reset: card;
 }
 .card {
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-  padding: 1.5rem;
+  padding: 1.75rem;
   background: var(--bg-elev);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  overflow: hidden;
 }
 .card:hover {
-  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
-  transform: translateY(-3px);
-  box-shadow: 0 16px 40px -12px color-mix(in srgb, var(--accent) 18%, rgba(0,0,0,0.4));
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+  transform: translateY(-4px);
+  box-shadow:
+    0 8px 24px -6px rgba(0, 0, 0, 0.4),
+    0 0 0 1px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 .card h3 {
   margin: 0;
@@ -321,9 +333,8 @@ pre {
 .card p {
   margin: 0;
   color: var(--muted);
-  font-size: 0.975rem;
+  font-size: 0.95rem;
 }
-/* Make the whole card clickable via its main link. */
 .card .stretched::after {
   content: '';
   position: absolute;
@@ -492,7 +503,7 @@ textarea {
   background: var(--bg-soft);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 textarea {
   min-height: 8rem;
@@ -574,7 +585,7 @@ main:focus {
   outline: none;
 }
 
-/* ---------- spacing utilities (keeps markup free of inline style= for strict CSP) ---------- */
+/* ---------- spacing utilities ---------- */
 .section-tight {
   padding-top: 0.5rem;
 }
@@ -586,6 +597,18 @@ main:focus {
 }
 .mt-3 {
   margin-top: 1.25rem;
+}
+
+/* ---------- entrance animation ---------- */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ---------- scroll-driven reveal ---------- */
@@ -608,7 +631,7 @@ main:focus {
   }
 }
 
-/* ---------- float keyframe (hero orb) ---------- */
+/* ---------- float keyframe (hero) ---------- */
 @keyframes float {
   from { transform: translate(0, 0) scale(1); }
   to   { transform: translate(-3rem, 2.5rem) scale(1.07); }
@@ -622,7 +645,7 @@ main:focus {
 
 /* ---------- gradient text ---------- */
 .gradient-text {
-  background: linear-gradient(135deg, var(--fg) 30%, var(--accent));
+  background: linear-gradient(135deg, var(--fg) 40%, var(--accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -633,13 +656,14 @@ main:focus {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  font-size: 0.78rem;
-  letter-spacing: 0.06em;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
   border: 1px solid var(--border-strong);
   border-radius: 999px;
-  padding: 0.3rem 0.85rem;
+  padding: 0.35rem 0.9rem;
 }
 .pill-dot {
   width: 0.45rem;

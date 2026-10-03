@@ -51,7 +51,7 @@ export const site = {
    * Used for links, buttons and small highlights. Keep it light enough to pass WCAG AA
    * contrast on the dark background (#0c1018).
    */
-  accent: '#8ba6c7',
+  accent: '#5eabd4',
 
   /** Default locale for <html lang> and RSS. */
   lang: 'en',

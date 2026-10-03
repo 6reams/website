@@ -1,5 +1,6 @@
 ---
 import '@fontsource-variable/inter';
+import '@fontsource-variable/space-grotesk';
 import '@fontsource-variable/jetbrains-mono';
 import '../styles/global.css';
 import '../styles/shiki.generated.css';
@@ -11,9 +12,11 @@ import Footer from '../components/Footer.astro';
 export interface Props extends SeoProps {
   /** Optional page-specific <meta> CSP (used by /admin, which talks to Firebase). Production only. */
   metaCsp?: string;
+  /** Hide header + footer for minimal pages (e.g. homepage). */
+  hideNav?: boolean;
 }
 
-const { metaCsp, ...seo } = Astro.props;
+const { metaCsp, hideNav, ...seo } = Astro.props;
 const accentCss = `:root{--accent:${site.accent}}`;
 ---
 
@@ -33,10 +36,10 @@ const accentCss = `:root{--accent:${site.accent}}`;
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    <Header />
+    {!hideNav && <Header />}
     <main id="main" tabindex="-1">
       <slot />
     </main>
-    <Footer />
+    {!hideNav && <Footer />}
   </body>
 </html>
