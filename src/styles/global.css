@@ -14,17 +14,17 @@
   --gutter: clamp(1.25rem, 4vw, 2rem);
   --space: clamp(5rem, 12vw, 8rem);
 
-  --bg: #0b0f16;
-  --bg-soft: #111821;
-  --bg-elev: #161e29;
-  --bg-elev-2: #141b25;
+  --bg: #000000;
+  --bg-soft: #1d1d1d;
+  --bg-elev: #272727;
+  --bg-elev-2: #2e2f30;
 
   --fg: #e8ecf2;
   --muted: #8a97a8;
-  --border: rgba(255, 255, 255, 0.07);
-  --border-strong: rgba(255, 255, 255, 0.14);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
 
-  --accent-fg: #0b0f16;
+  --accent-fg: #000000;
   --accent-soft: color-mix(in srgb, var(--accent) 12%, transparent);
   --glow: color-mix(in srgb, var(--accent) 16%, transparent);
 
@@ -450,7 +450,7 @@ pre.astro-code {
   padding: 1.1rem 1.25rem;
   border-radius: var(--radius);
   border: 1px solid var(--border);
-  background: var(--code-bg, #0d1117);
+  background: var(--code-bg, #1d1d1d);
   color: var(--code-fg, #e6edf3);
   overflow-x: auto;
   font-size: 0.85rem;

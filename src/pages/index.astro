@@ -9,6 +9,12 @@ const projects = (await getProjects()).filter((p) => p.data.featured).slice(0, 4
 const allCerts = await getCerts();
 const featuredIds = ['cpts', 'emapt', 'oswp', 'crtp'];
 const certs = featuredIds.map((id) => allCerts.find((c) => c.id === id)).filter(Boolean);
+const certBadges: Record<string, string> = {
+  cpts: '/images/certs/cpts.png',
+  emapt: '/images/certs/emapt.png',
+  oswp: '/images/certs/oswp.png',
+  crtp: '/images/certs/crtp.png',
+};
 const workItems = timeline.filter((item) => item.kind === 'work');
 
 const fmtDate = (d: Date) =>
@@ -113,9 +119,7 @@ const fmtDate = (d: Date) =>
         {certs.map((cert) => cert && (
           <div class="cert-card">
             <div class="cert-visual">
-              <div class="cert-icon">
-                <span class="cert-abbr-large">{cert.data.abbr}</span>
-              </div>
+              <img src={certBadges[cert.id]} alt={cert.data.name} width="120" height="120" loading="lazy" />
             </div>
             <div class="cert-info">
               <strong class="cert-name">{cert.data.name}</strong>
@@ -445,21 +449,14 @@ const fmtDate = (d: Date) =>
     aspect-ratio: 1;
     display: grid;
     place-items: center;
-    background:
-      radial-gradient(ellipse at 30% 30%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%),
-      var(--bg-soft);
+    background: var(--bg-soft);
     border-bottom: 1px solid var(--border);
+    padding: 1.25rem;
   }
-  .cert-icon {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-  }
-  .cert-abbr-large {
-    font: 800 1.8rem/1 var(--font-display);
-    color: var(--accent);
-    letter-spacing: 0.04em;
+  .cert-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
   .cert-info {
     padding: 0.85rem 1rem;
