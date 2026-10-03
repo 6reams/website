@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import { unified } from '@astrojs/markdown-remark';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import { site } from './site.config.ts';
 import cspHashes from './src/integrations/csp-hashes.mjs';
@@ -14,7 +15,6 @@ export default defineConfig({
   site: site.url,
   trailingSlash: 'always',
   build: {
-    // Never inline CSS: keeps the CSP free of 'unsafe-inline' for styles.
     inlineStylesheets: 'never',
   },
   integrations: [
@@ -28,19 +28,19 @@ export default defineConfig({
       transformers: [styleToClass()],
       wrap: false,
     },
-    rehypePlugins: [
-      [rehypeSanitize, {
-        ...defaultSchema,
-        tagNames: [...(defaultSchema.tagNames ?? []), 'mark', 'details', 'summary'],
-        attributes: { ...defaultSchema.attributes, code: [['className']] },
-      }],
-    ],
+    processor: unified({
+      rehypePlugins: [
+        [rehypeSanitize, {
+          ...defaultSchema,
+          tagNames: [...(defaultSchema.tagNames ?? []), 'mark', 'details', 'summary'],
+          attributes: { ...defaultSchema.attributes, code: [['className']] },
+        }],
+      ],
+    }),
   },
   vite: {
     build: {
-      // Never inline assets as data: URIs (fonts, small images) — keeps img/font-src 'self'.
       assetsInlineLimit: 0,
-      // The Firebase SDK bundle is large but loads only on /admin, so the warning is expected.
       chunkSizeWarningLimit: 1200,
     },
   },
