@@ -8,7 +8,7 @@ export const site = {
   url: 'https://00000.rest',
 
   /** Brand shown in the header, page titles and the terminal prompt. */
-  brand: '00000',
+  brand: 'Bilaidi Site',
 
   /** Your real name — used on About, in meta tags and structured data. */
   name: 'Ahmad Bilaidi',
